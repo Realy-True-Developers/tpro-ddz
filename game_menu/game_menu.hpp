@@ -1,55 +1,51 @@
 #include <SFML/Graphics.hpp>
+#include <iostream>
+using namespace sf;
 
-namespace game {
 
+
+namespace game 
+{
 	class StartMenu
 	{
 	public:
-		float menu_X;                   // Координаты меню по X
-		float menu_Y;				    // Координаты меню по Y
-		int menu_Step;                  // Расстояние между пунктами меню
-		int max_menu;                   // Максимальное количество пунктов меню
-		int size_font;                  // Размер шрифта
-		int mainMenuSelected;           // Номер текущего пункта меню 
-		sf::Font font;                  // Шрифт меню 
-		// Динамический массив текстовых объектов названий пунктов меню
-        sf::Text* mainMenu;             
-		sf::Color menu_text_color = sf::Color::White;    // Цвет пунктов меню
-		sf::Color chose_text_color = sf::Color::Yellow;  // Цвет выбора пункта меню
-		sf::Color border_color = sf::Color::Black;       // Цвет обводки текста пунктов меню
+		float menu_X;				// Координаты меню по X
+		float menu_Y;				// Координаты меню по Y
+		int menu_Step;          	// Расстояние между пунктами меню
+		int max_menu;           	// Максимальное количество пунктов меню
+		int size_font;          	// Размер шрифта
+		int mainMenuSelected;		// Номер текущего пункта меню 
+		Font font;          		// Шрифт 
+		int OutlineThickness = 3;	// Толщина контура обводки текста
 
-		// Настройка текста пунктов меню
+		
+        Text* mainMenu;             // Динамический массив текстовых объектов названий пунктов меню
+		Color menu_text_color;		// Цвет пунктов меню
+		Color chosen_text_color;	// Цвет выбора пункта меню
+		Color border_color;			// Цвет обводки текста пунктов меню
+
+		RenderWindow& mywindow;	// Ссылка на графическое окно
+
         // Параметры: ссылка на текстовый объект, текст, координаты текста
-		void setInitText(sf::Text& text, sf::String str, float xpos, float ypos);
-        // Ссылка на графическое окно
-		sf::RenderWindow& mywindow;   	
-	
-		// Конструктор 
+		void setInitText(Text& text, String str, float xpos, float ypos); // Настройка текста пунктов меню
+
         // Параметры: ссылка на графическое окно, координаты игрового меню по x и y
         // количество пунктов меню, массив названий пунктов меню, размер шрифта, шаг между пунктами меню
-		StartMenu(sf::RenderWindow& window, float menux, float menuy, 
-                 int index, sf::String name[], int sizeFont = 60, int step = 80);
+		StartMenu(RenderWindow& window, float menux, float menuy, int index, String name[], int sizeFont = 60, int step = 80); // Конструктор 
        
-		~StartMenu()
-		{
-			delete[] mainMenu;
-		}
+		~StartMenu() {delete[] mainMenu;}
 
-		void draw();        // Рисуем меню
+		void draw();       // Отрисовка меню
 
 		void MoveUp();     // Перемещение выбора меню вверх
 
 		void MoveDown();   // Перемещение выбора меню вниз
         
-        // Цвет элементов игрового меню
-		void setColorTextMenu(sf::Color menColor, sf::Color ChoColor, 
-                              sf::Color BordColor);  
+        
+		void setColorTextMenu(Color menColor, Color ChoColor, Color BordColor);  // Установка цвета элементов игрового меню
 
 		void AlignMenu(int posx);   // Выравнивание положения меню
 
-		int getSelectedMenuNumber() // Возвращает номер выбранного элемента меню
-		{
-			return mainMenuSelected;
-		}
+		int getSelectedMenuNumber() {return mainMenuSelected;} // Возвращает номер выбранного элемента меню
 	};
 }

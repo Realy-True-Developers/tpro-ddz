@@ -2,19 +2,18 @@
 
 using namespace sf;
 
-// функция настройки текста
-void InitText(Text& mtext, float xpos, float ypos, String str, int size_font = 60, 
-    Color menu_text_color = Color::White, int bord = 0, Color border_color = Color::Black);
 
-// Функция перехода к игре
-void GameStart()
+
+void InitText(Text& mtext, float xpos, float ypos, String str, int size_font = 60, Color menu_text_color = Color::White, 
+int bord = 0, Color border_color = Color::Black); // функция настройки текста
+
+
+void GameStart() // Функция запуска игры
 {
     RenderWindow Play(VideoMode::getDesktopMode(), L"Уровень 1", Style::Fullscreen);
-
-
     RectangleShape background_play(Vector2f(1920, 1080));
-
     Texture texture_play;
+
     if (!texture_play.loadFromFile("../../images/doodle_main.png")) exit(1);
     background_play.setTexture(&texture_play);
 
@@ -34,22 +33,22 @@ void GameStart()
     }
 }
 
-// Функция настройки игры
-void Options()
+
+void Options() // Функция настройки игры
 {
     RenderWindow Options(VideoMode::getDesktopMode(), L"Настройки", Style::Fullscreen);
-
     RectangleShape background_opt(Vector2f(1920, 1080));
     Texture texture_opt;
-    if (!texture_opt.loadFromFile("../../images/doodle_main.png")) exit(2);
 
+    if (!texture_opt.loadFromFile("../../images/doodle_main.png")) exit(2);
     background_opt.setTexture(&texture_opt);
+
     while (Options.isOpen())
     {
         Event event_opt;
         while (Options.pollEvent(event_opt))
         {
-            if (event_opt.type == Event::Closed) Options.close();
+            // if (event_opt.type == Event::Closed) Options.close(); // Переходит в главное меню по нажатию alt + f4
             if (event_opt.type == Event::KeyPressed)
             {
                 if (event_opt.key.code == Keyboard::Escape) Options.close();
@@ -62,12 +61,13 @@ void Options()
 
 }
 
-// Функция с описанием игры
-void About_Game()
+
+void About_Game() // Функция с описанием игры
 {
     RenderWindow About(VideoMode::getDesktopMode(), L"О игре", Style::Fullscreen);
     RectangleShape background_ab(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture texture_ab;
+
     if (!texture_ab.loadFromFile("../../images/doodle_main.png")) exit(3);
     background_ab.setTexture(&texture_ab);
     
@@ -76,7 +76,7 @@ void About_Game()
         Event event_play;
         while (About.pollEvent(event_play))
         {
-            if (event_play.type == Event::Closed) About.close();
+            // if (event_play.type == Event::Closed) About.close();  // Переходит в главное меню по нажатию alt + f4
             if (event_play.type == Event::KeyPressed)
             {
                 if (event_play.key.code == Keyboard::Escape) About.close();
@@ -91,71 +91,52 @@ void About_Game()
 
 int main()
 {
-    
-    // Создаём окно windows
-    RenderWindow window;
-    // Параметры: размер окна установить согласно текущему разрешению экрана
-    // название моя игра, развернуть графическое окно на весь размер экрана
-    window.create(VideoMode::getDesktopMode(), L"Моя игра", Style::Fullscreen);
+    setlocale(LC_ALL,"Rus");
 
-    //отключаем видимость курсора
-    window.setMouseCursorVisible(false); 
+    RenderWindow window;  // Создаём окно 
+    window.create(VideoMode::getDesktopMode(), L"Doodle Jump", Style::Fullscreen);
 
-    // получаем текущий размер экрана
-    float width = VideoMode::getDesktopMode().width;
+    window.setMouseCursorVisible(false);                    //отключаем видимость курсора
+
+    float width = VideoMode::getDesktopMode().width;        // получение текущего размера экрана
     float height = VideoMode::getDesktopMode().height;
-
-    // Устанавливаем фон для графического окна 
-    // Создаём прямоугольник
-    RectangleShape background(Vector2f(width, height));
-    // Загружаем в прямоугольник текстуру с изображением sources/images/doodle_main.jpg
+    
+    RectangleShape background(Vector2f(width, height));     // Создание прямоугольника
     Texture texture_window;
-    if (!texture_window.loadFromFile("../../images/doodle_main.png")) return 4;
+
+    if (!texture_window.loadFromFile("../../images/doodle_main.png")) exit(2); // Установка фона главного меню
     background.setTexture(&texture_window);
 
-    // Устанавливаем шрифт для названия игры
     Font font;
-    if (!font.loadFromFile("C:/Works/tpro-ddz/fonts/troika.otf")) return 5;
+    if (!font.loadFromFile("../../fonts/ArialRegular.ttf")) exit(3);             // Установка шрифта главного меню
     Text Titul;
     Titul.setFont(font);
-     // Текст с названием игры
-    InitText(Titul, 480, 50, L"Апокалипсис", 150, Color(237, 147, 0), 3);
-
-    // Название пунктов меню
-    String name_menu[]{ L"Старт",L"Настройки", L"О игре",L"Выход"};
     
-    // Объект игровое меню
-    game::StartMenu mymenu(window, 950, 350, 4, name_menu, 100, 120);
-    // Установка цвета элементов пунктов меню
-    mymenu.setColorTextMenu(Color(237, 147, 0), Color::Red, Color::Black);
-    // выравнивание по центру пунктов меню 
-    mymenu.AlignMenu(2);
+    InitText(Titul, 350, 50, L"Doodle Jump", 150, Color(237, 147, 0), 3);   // Текст с названием игры
+
+    String name_menu[]{ L"Играть", L"Настройки", L"Об игре", L"Выход"};     // Название пунктов меню
+    game::StartMenu mymenu(window, 150, 350, 4, name_menu, 100, 120);       // Объект игровое меню
+    mymenu.setColorTextMenu(Color(237, 147, 0), Color::Red, Color::Black);  // Установка цвета элементов пунктов меню
+    mymenu.AlignMenu(3);                                                    // выравнивание по левому краю пунктов меню 
             
     while (window.isOpen())
     {
         Event event;
         while (window.pollEvent(event))
         {
-            if (event.type == Event::KeyReleased)
+            if (event.type == Event::KeyReleased) // События выбра пунктов меню
             {
-                // События выбра пунктов меню
-                // нажати на клавиатуре стрелки вверх
-                if (event.key.code == Keyboard::Up) { mymenu.MoveUp(); }   
-                // нажати на клавиатуре стрелки вниз
-                if (event.key.code == Keyboard::Down) { mymenu.MoveDown(); }  
-                // нажати на клавиатуре клавиши Enter
-                if (event.key.code == Keyboard::Return)                       
+                if (event.key.code == Keyboard::Up) { mymenu.MoveUp(); }        // Нажатие на клавиатуре стрелки вверх
+                if (event.key.code == Keyboard::Down) { mymenu.MoveDown(); }    // Нажатие на клавиатуре стрелки вниз
+                if (event.key.code == Keyboard::Return)                         // Нажатие на клавиатуре клавиши Enter                     
                 {
-                    // Переходим на выбранный пункт меню
-                    switch (mymenu.getSelectedMenuNumber())
+                    switch (mymenu.getSelectedMenuNumber())                     // Переход на выбранный пункт меню
                     {
                     case 0:GameStart();   break;
                     case 1:Options();     break;
                     case 2:About_Game();  break;
                     case 3:window.close(); break;
-                        
                     }
-                    
                 }
             }
         }
@@ -170,9 +151,8 @@ int main()
     return 0;
 }
 
-// функция настройки текста
-void InitText(Text& mtext, float xpos, float ypos, String str, int size_font, 
-    Color menu_text_color, int bord, Color border_color)
+
+void InitText(Text& mtext, float xpos, float ypos, String str, int size_font, Color menu_text_color, int bord, Color border_color) // функция настройки текста
 {
     mtext.setCharacterSize(size_font);
     mtext.setPosition(xpos, ypos);
