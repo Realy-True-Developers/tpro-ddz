@@ -38,12 +38,12 @@ void game::StartMenu::AlignMenu(int posx) // Выравнивание пункт
 }
 
 
-game::StartMenu::StartMenu(RenderWindow& window, float menu_x, float menu_y, int max_point_menu, String name[], int sizeFont, int step) // Конструктор
-	:mywindow(window), menu_X(menu_x), menu_Y(menu_y), size_font(sizeFont), menu_Step(step), max_menu(max_point_menu), mainMenu(new Text[max_menu])
+game::StartMenu::StartMenu(RenderWindow& window, float menu_x, float menu_y, int step, int max_point_menu, String name[], int sizeFont) // Конструктор
+	:mywindow(window), menu_X(menu_x), menu_Y(menu_y), menu_Step(step), size_font(sizeFont), max_menu(max_point_menu), mainMenu(new Text[max_menu])
 {
 	if (!font.loadFromFile("../../fonts/ArialRegular.ttf")) exit(1);	// Загрузка шрифта
 
-	for (int i = 0,  ypos = menu_Y; i < max_menu; ++i, ypos += menu_Step) setInitText(mainMenu[i], name[i], menu_X, ypos); // Выстраивание элементов  меню
+	for (int i = 0, ypos = menu_Y; i < max_menu; ++i, ypos += menu_Step) setInitText(mainMenu[i], name[i], menu_X, ypos); // Выстраивание элементов  меню
 	
 	mainMenuSelected = 0;											// Задаём начальное положения выбраного пункта меню
 	mainMenu[mainMenuSelected].setFillColor(chosen_text_color); 	// Подсвечиваем выбранный пункт меню
@@ -70,7 +70,8 @@ void game::StartMenu::MoveDown() // Перемещение выбора меню
 void game::StartMenu::MoveUp() // Перемещение выбора меню вверх
 {
 	mainMenuSelected--;  
-	if (mainMenuSelected >= 0) {
+	if (mainMenuSelected >= 0) 
+	{
 		mainMenu[mainMenuSelected].setFillColor(chosen_text_color);		// Подсветка выбранного пункта меню
 		mainMenu[mainMenuSelected + 1].setFillColor(menu_text_color);	// Устанавка стандартного цвета для следующего пункта
 	}
@@ -79,6 +80,17 @@ void game::StartMenu::MoveUp() // Перемещение выбора меню �
 		mainMenuSelected = max_menu - 1;
 		mainMenu[0].setFillColor(menu_text_color);
 		mainMenu[mainMenuSelected].setFillColor(chosen_text_color);
+	}
+}
+
+void game::StartMenu::MouseChosen(int chosen_point) 				// Выбор пункта меню мышкой
+{
+	mainMenuSelected = chosen_point;  
+	mainMenu[mainMenuSelected].setFillColor(chosen_text_color);		// Подсветка выбранного пункта меню
+	for(int i = 0; i < max_menu; ++i)
+	{
+		if(i != mainMenuSelected)
+			mainMenu[i].setFillColor(menu_text_color);				// Подсветка остальных пунктов меню
 	}
 }
 
@@ -102,4 +114,15 @@ void game::StartMenu::setColorTextMenu(Color menColor, Color ChosenColor, Color 
 	}
 
 	mainMenu[mainMenuSelected].setFillColor(chosen_text_color);
+}
+
+
+void InitText(Text& mtext, float xpos, float ypos, String str, int size_font, Color menu_text_color, int bord, Color border_color) // функция настройки текста
+{
+    mtext.setCharacterSize(size_font);
+    mtext.setPosition(xpos, ypos);
+    mtext.setString(str);
+    mtext.setFillColor(menu_text_color);
+    mtext.setOutlineThickness(bord);
+    mtext.setOutlineColor(border_color);
 }
