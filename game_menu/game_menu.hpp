@@ -31,7 +31,7 @@ namespace game
 
         // Параметры: ссылка на графическое окно, координаты игрового меню по x и y
         // количество пунктов меню, массив названий пунктов меню, размер шрифта, шаг между пунктами меню
-		StartMenu(RenderWindow& window, float menux, float menuy, int index, String name[], int sizeFont = 60, int step = 80); // Конструктор 
+		StartMenu(RenderWindow& window, float menux, float menuy, int step, int index, String name[], int sizeFont = 60); // Конструктор 
        
 		~StartMenu() {delete[] mainMenu;}
 
@@ -41,11 +41,20 @@ namespace game
 
 		void MoveDown();   // Перемещение выбора меню вниз
         
-        
 		void setColorTextMenu(Color menColor, Color ChoColor, Color BordColor);  // Установка цвета элементов игрового меню
 
 		void AlignMenu(int posx);   // Выравнивание положения меню
 
+		void MouseChosen(int chosen_point); // Выбор пункта меню мышкой
+
 		int getSelectedMenuNumber() {return mainMenuSelected;} // Возвращает номер выбранного элемента меню
 	};
 }
+
+void InitText(Text& mtext, float xpos, float ypos, String str, int size_font = 60, Color menu_text_color = Color::White, 
+int bord = 0, Color border_color = Color::Black); // функция настройки текста
+
+
+void About_Game();
+void Options(); 	// Функция настройки игры
+void GameStart();	// Функция запуска игры
