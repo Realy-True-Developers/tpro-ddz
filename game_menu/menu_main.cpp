@@ -9,13 +9,7 @@ int main()
 
     RenderWindow window;  // Создаём окно 
     window.create(VideoMode::getDesktopMode(), L"Doodle Jump", Style::Fullscreen);
-
-    // window.setMouseCursorVisible(false);                    //отключаем видимость курсора
-
-    float width = VideoMode::getDesktopMode().width;        // получение текущего размера экрана
-    float height = VideoMode::getDesktopMode().height;
-    
-    RectangleShape background(Vector2f(width, height));     // Создание прямоугольника
+    RectangleShape background(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture texture_window;
 
     if (!texture_window.loadFromFile("../../images/doodle_main.png")) exit(2); // Установка фона главного меню
@@ -26,13 +20,13 @@ int main()
     Text Titul;
     Titul.setFont(font);
     
-    InitText(Titul, 350, 50, L"Doodle Jump", 150, Color(237, 147, 0), 3);      // Текст с названием игры
+    FillText(Titul, 350, 50, L"Doodle Jump", 150, Color(237, 147, 0), 3);      // Текст с названием игры
     String name_menu[]{ L"GameStart", L"Options", L"About Game", L"Exit"};     // Название пунктов меню
 
     int left_pos = 150, top_pos = 350, step_pos = 150;
     game::StartMenu mymenu(window, left_pos, top_pos, step_pos, 4, name_menu, 100); // Объект игровое меню
-    mymenu.setColorTextMenu(Color(237, 147, 0), Color::Red, Color::Black);          // Установка цвета элементов пунктов меню
-    mymenu.AlignMenu(3);                                                            // выравнивание по левому краю пунктов меню 
+    // mymenu.setColorTextMenu(Color(237, 147, 0), Color::Red, Color::Black);          // Установка цвета элементов пунктов меню
+    mymenu.AlignMenu(3);                                                            // Выравнивание по левому краю пунктов меню 
             
     while (window.isOpen())
     {
@@ -54,11 +48,11 @@ int main()
             else if (event.type == Event::KeyReleased) // События выбора пунктов меню
             {
                 if (event.key.code == Keyboard::Escape) { window.close(); }
-                if (event.key.code == Keyboard::Up) { mymenu.MoveUp(); }        // Нажатие на клавиатуре стрелки вверх
-                if (event.key.code == Keyboard::Down) { mymenu.MoveDown(); }    // Нажатие на клавиатуре стрелки вниз
-                if (event.key.code == Keyboard::Return)                         // Нажатие на клавиатуре клавиши Enter                     
+                if (event.key.code == Keyboard::Up) { mymenu.MoveKeyUp(); }         // Нажатие на клавиатуре стрелки вверх
+                if (event.key.code == Keyboard::Down) { mymenu.MoveKeyDown(); }     // Нажатие на клавиатуре стрелки вниз
+                if (event.key.code == Keyboard::Enter)                             // Нажатие на клавиатуре клавиши Enter                     
                 {
-                    switch (mymenu.getSelectedMenuNumber())                     // Переход на выбранный пункт меню
+                    switch (mymenu.getSelectedMenuNumber())                         // Переход на выбранный пункт меню
                     {
                     case 0:GameStart();   break;
                     case 1:Options();     break;
@@ -70,13 +64,12 @@ int main()
 
 		    if (Mouse::isButtonPressed(Mouse::Left))
 		    {
-			    if (mymenu.mainMenuSelected == 0) {GameStart(); }
-			    if (mymenu.mainMenuSelected == 1) {Options(); break;}
+			    if (mymenu.mainMenuSelected == 0) {GameStart(); break;}
+			    if (mymenu.mainMenuSelected == 1) {window.close(); Options(); break;}
 			    if (mymenu.mainMenuSelected == 2) {About_Game(); break;}
                 if (mymenu.mainMenuSelected == 3) {window.close(); break;}
 		    }
         }
-        // std::cout << float(mymenu.mainMenu[0].getLocalBounds().height);
         window.clear();
         window.draw(background);
         window.draw(Titul);
