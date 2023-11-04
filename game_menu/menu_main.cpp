@@ -6,6 +6,7 @@ using namespace sf;
 int main()
 {
     setlocale(LC_ALL, "Rus");
+    setlocale(LC_ALL, "Rus");
 
     RenderWindow window;  // Создаём окно 
     window.create(VideoMode::getDesktopMode(), L"Doodle Jump", Style::Fullscreen);
