@@ -213,9 +213,10 @@ void Options() // Функция настройки игры
 	Text exit, save;
 	exit.setFont(font); save.setFont(font);
 
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+
 	String settings_text[]{L"Your name", L"Color", L"Manipulation", L"Game field"};
 
-	
 	float pos_y = 50, step = 200, pos_x = 50, exit_save_y = 900;
 
 	//game::MenuSettings settings(Options, pos_x, pos_y, step, 4, settings_text, 100);
@@ -228,7 +229,7 @@ void Options() // Функция настройки игры
 	
 	FillText(exit, pos_x, exit_save_y, L"Exit", 130, options_text_color);
 	FillText(save, 1920 - 280 - pos_x, exit_save_y, L"Save", 130, options_text_color);
-	
+
 	Color color_border = Color::Color( 255,192,203);
 
 	int board = 5, board_t_name = 65, len_board_name = 600, pos_x_board_name = 800;
@@ -284,9 +285,10 @@ void Options() // Функция настройки игры
 	triangle[3].move(len_board_name - triangle_width * 4, settings_desc_text[3].getPosition().y - settings_desc_text[1].getPosition().y);
 
 	field_size.setPosition(chose_color.getPosition().x - 10, chose_color.getPosition().y + settings_desc_text[3].getPosition().y - settings_desc_text[1].getPosition().y - 20);
+	
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-
-
+	
 
 	int OptionsMenuSelected = 0;
 	std::string inputed_name;
@@ -296,12 +298,59 @@ void Options() // Функция настройки игры
         Event event_opt;
         while (Options.pollEvent(event_opt))
         {
+
+			if(IntRect(border_name[0].getPosition().x,border_name[0].getPosition().y,border_name[1].getPosition().x - border_name[3].getPosition().x,
+			 border_name[2].getPosition().y - border_name[0].getPosition().y).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 0;}
+            
+		    else if(IntRect(triangle[0].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 1;}
+			else if(IntRect(triangle[1].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 2;}
+
+			else if(IntRect(manip_l[0].getPosition().x,manip_l[0].getPosition().y,manip_l[1].getPosition().x - manip_l[3].getPosition().x,
+			 manip_l[2].getPosition().y - manip_l[0].getPosition().y).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 3;}
+
+			else if(IntRect(manip_r[0].getPosition().x,manip_r[0].getPosition().y,manip_r[1].getPosition().x - manip_r[3].getPosition().x,
+			 manip_r[2].getPosition().y - manip_r[0].getPosition().y).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 4;}
+
+			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 5;}
+			else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 6;}	
+
+
+			else if (event_opt.type == Event::KeyPressed)
+            {
+				if(event_opt.key.code == Keyboard::Up)
+				{ switch (OptionsMenuSelected)
+					{case 0: OptionsMenuSelected=8; break; case 1: OptionsMenuSelected=0; break; case 2: OptionsMenuSelected=0; break;
+					case 3: OptionsMenuSelected=1; break; case 4: OptionsMenuSelected=2; break; case 5: OptionsMenuSelected=3; break;
+					case 6: OptionsMenuSelected=4; break; case 7: OptionsMenuSelected=5; break; case 8: OptionsMenuSelected=5; break; } }
+				if(event_opt.key.code == Keyboard::Down)
+				{ switch (OptionsMenuSelected)
+					{case 0: OptionsMenuSelected=1; break; case 1: OptionsMenuSelected=3; break; case 2: OptionsMenuSelected=4; break;
+					case 3: OptionsMenuSelected=5; break; case 4: OptionsMenuSelected=6; break; case 5: OptionsMenuSelected=7; break;
+					case 6: OptionsMenuSelected=7; break; case 7: OptionsMenuSelected=0; break; case 8: OptionsMenuSelected=0; break; } }
+				if(event_opt.key.code == Keyboard::Right){++OptionsMenuSelected %=9;}
+				if(event_opt.key.code == Keyboard::Left){--OptionsMenuSelected %=9;}
+
+				if (event_opt.key.code == Keyboard::Escape) Options.close();
+				if (event_opt.type == Event::Closed) Options.close();
+            }	
+
+
+			
+
+
+
+
+
+
+
+
 			if(OptionsMenuSelected == 0)
 			{
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(chosen_color);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				exit.setFillColor(options_text_color); save.setFillColor(options_text_color);
-				if (event_opt.type == sf::Event::TextEntered) {
+				if (event_opt.type == Event::TextEntered) 
+				{
 					if (event_opt.text.unicode < 128) 
 					{
 						if (event_opt.text.unicode == 8 && inputed_name.size() > 0) { 		// Нажатие backspace
@@ -383,12 +432,14 @@ void Options() // Функция настройки игры
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				exit.setFillColor(options_text_color); save.setFillColor(chosen_color);
 			}
-			// if (IntRect(exit.getPosition().x, exit.getPosition().y, exit.getLocalBounds().width,
-            //  exit.getLocalBounds().height + exit.getCharacterSize()/4).contains(Mouse::getPosition(Options))) { MouseChosen(0) }
-            
-		    // else if (IntRect(save.getPosition().x, save.getPosition().y, save.getLocalBounds().width,
-            //  save.getLocalBounds().height + save.getCharacterSize()/4).contains(Mouse::getPosition(Options))) { MouseChosen(1) }
 
+
+
+
+
+
+
+			
             // else if (event_opt.type == Event::KeyReleased) // События выбора пунктов меню
             // {
             //     if (event_opt.key.code == Keyboard::Escape) {  }
@@ -414,13 +465,8 @@ void Options() // Функция настройки игры
             //     if (mymenu.mainMenuSelected == 3) {window.close(); break;}
 		    // }
 
-
-
             // if (event_opt.type == Event::Closed) Options.close(); // Переходит в главное меню по нажатию alt + f4
-            if (event_opt.type == Event::KeyPressed)
-            {
-                if (event_opt.key.code == Keyboard::Escape) Options.close();
-            }
+            
         }
         Options.clear();
 		Options.draw(options_back);
