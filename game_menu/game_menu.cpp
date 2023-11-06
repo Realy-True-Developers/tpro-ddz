@@ -238,18 +238,22 @@ void Options() // Функция настройки игры
 	border_name[2].setSize(Vector2f(len_board_name, board)), border_name[3].setSize(Vector2f(board, 95));
 	border_name[0].setPosition(Vector2f(pos_x_board_name, board_t_name)), border_name[1].setPosition(Vector2f(pos_x_board_name + len_board_name, board_t_name));
 	border_name[2].setPosition(Vector2f(pos_x_board_name, board_t_name+90)), border_name[3].setPosition(Vector2f(pos_x_board_name, board_t_name));
-	for (size_t i = 0; i < 4; ++i) {border_name[i].setFillColor(color_border);}
 
+	for (size_t i = 0; i < 4; ++i) {border_name[i].setFillColor(color_border);}
 	int triangle_width = 50, triangle_height = 90;
+
 	ConvexShape* triangle = new ConvexShape[4];
 	for (size_t i = 0; i < 4; ++i)
-	{
-		triangle[i].setPointCount(3); triangle[i].setFillColor(color_border);
-		triangle[i].setPoint(0, Vector2f(pos_x_board_name + triangle_width * 2, settings_desc_text[1].getPosition().y + 20));
-		triangle[i].setPoint(1, Vector2f(pos_x_board_name + triangle_width, settings_desc_text[1].getPosition().y + triangle_height/2 + 20));
-		triangle[i].setPoint(2, Vector2f(pos_x_board_name + triangle_width * 2, settings_desc_text[1].getPosition().y + triangle_height + 20));
-	}
-	triangle[1].move(len_board_name - triangle_width * 4, 0); triangle[1].setPoint(1, Vector2f(pos_x_board_name + triangle_width * 3, settings_desc_text[1].getPosition().y + triangle_height/2 + 20));
+	{ triangle[i].setPointCount(3); triangle[i].setFillColor(color_border); }
+	triangle[0].setPoint(0, Vector2f(pos_x_board_name + triangle_width * 2, settings_desc_text[1].getPosition().y + 20));
+	triangle[0].setPoint(1, Vector2f(pos_x_board_name + triangle_width, settings_desc_text[1].getPosition().y + triangle_height/2 + 20));
+	triangle[0].setPoint(2, Vector2f(pos_x_board_name + triangle_width * 2, settings_desc_text[1].getPosition().y + triangle_height + 20));
+	
+	int move_right_triangle = len_board_name - triangle_width * 4;
+
+	triangle[1].setPoint(0, Vector2f(move_right_triangle + pos_x_board_name + triangle_width * 3, settings_desc_text[1].getPosition().y + triangle_height/2 + 20));
+	triangle[1].setPoint(1, Vector2f(move_right_triangle + pos_x_board_name + triangle_width * 2, settings_desc_text[1].getPosition().y + 20));
+	triangle[1].setPoint(2, Vector2f(move_right_triangle + pos_x_board_name + triangle_width * 2, settings_desc_text[1].getPosition().y + triangle_height + 20));
 
 	RectangleShape chose_color; chose_color.setSize(Vector2f(300, triangle_height)); chose_color.setFillColor(Color::Blue);
 	chose_color.setPosition(triangle[0].getLocalBounds().getPosition().x + 100, triangle[0].getLocalBounds().getPosition().y);
@@ -259,7 +263,7 @@ void Options() // Функция настройки игры
 	name.setCharacterSize(70); left.setCharacterSize(options_text_size); right.setCharacterSize(options_text_size); field_size.setCharacterSize(options_text_size);
 	name.setFillColor(Color::Black); left.setFillColor(options_text_color); right.setFillColor(options_text_color); field_size.setFillColor(options_text_color);
 	name.setString(L"Enter your name:"); left.setString(L"Left"); right.setString(L"Right"); field_size.setString(L"Normal");
-	name.setPosition(pos_x + settings_desc_text[0].getLocalBounds().width+300-10, pos_y + board*4);
+	name.setPosition(pos_x + settings_desc_text[0].getLocalBounds().width+300-10, pos_y + board*4 -7);
 	left.setPosition(pos_x_board_name, settings_desc_text[2].getPosition().y);
 	right.setPosition(pos_x_board_name + 350, settings_desc_text[2].getPosition().y);
 
@@ -280,15 +284,20 @@ void Options() // Функция настройки игры
 	manip_r[2].setPosition(manip_l[2].getPosition()); manip_r[3].setPosition(manip_l[3].getPosition());
 	for (size_t i = 0; i < 4; ++i) {manip_r[i].setFillColor(color_border);  manip_r[i].move(420, 0);}
 
-	triangle[3].setPoint(1, Vector2f(pos_x_board_name + triangle_width * 3, settings_desc_text[1].getPosition().y + triangle_height/2 + 20));
-	triangle[2].move(0, settings_desc_text[3].getPosition().y - settings_desc_text[1].getPosition().y);
-	triangle[3].move(len_board_name - triangle_width * 4, settings_desc_text[3].getPosition().y - settings_desc_text[1].getPosition().y);
+	triangle[2].setPoint(0,Vector2f(pos_x_board_name+triangle_width,settings_desc_text[3].getPosition().y-settings_desc_text[1].getPosition().y+settings_desc_text[1].getPosition().y+triangle_height/2+20));
+	triangle[2].setPoint(1,Vector2f(pos_x_board_name+triangle_width*2,settings_desc_text[1].getPosition().y+20+settings_desc_text[3].getPosition().y-settings_desc_text[1].getPosition().y));
+	triangle[2].setPoint(2,Vector2f(pos_x_board_name+triangle_width*2,settings_desc_text[1].getPosition().y+triangle_height+20+settings_desc_text[3].getPosition().y-settings_desc_text[1].getPosition().y));
+
+	triangle[3].setPoint(0,Vector2f(move_right_triangle+triangle_width*2+pos_x_board_name+triangle_width,settings_desc_text[3].getPosition().y-settings_desc_text[1].getPosition().y+settings_desc_text[1].getPosition().y+triangle_height/2+20));
+	triangle[3].setPoint(1,Vector2f(move_right_triangle+pos_x_board_name+triangle_width*2,settings_desc_text[1].getPosition().y+20+settings_desc_text[3].getPosition().y-settings_desc_text[1].getPosition().y));
+	triangle[3].setPoint(2,Vector2f(move_right_triangle+pos_x_board_name+triangle_width*2,settings_desc_text[1].getPosition().y+triangle_height+20+settings_desc_text[3].getPosition().y-settings_desc_text[1].getPosition().y));
 
 	field_size.setPosition(chose_color.getPosition().x - 10, chose_color.getPosition().y + settings_desc_text[3].getPosition().y - settings_desc_text[1].getPosition().y - 20);
 	
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 
-	
+	std::vector<Color> list_colors{Color::Black, Color::Red, Color::Green, Color::Blue, Color::Yellow};
+	int color_selected = 0;
 
 	int OptionsMenuSelected = 0;
 	std::string inputed_name;
@@ -313,7 +322,11 @@ void Options() // Функция настройки игры
 
 			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 5;}
 			else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 6;}	
-
+			else if(IntRect(exit.getPosition().x, exit.getPosition().y, exit.getLocalBounds().width,
+             exit.getLocalBounds().height + exit.getCharacterSize()/4).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 7;}
+			
+			else if(IntRect(save.getPosition().x, save.getPosition().y, save.getLocalBounds().width,
+             save.getLocalBounds().height + save.getCharacterSize()/4).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 8;}
 
 			else if (event_opt.type == Event::KeyPressed)
             {
@@ -332,7 +345,7 @@ void Options() // Функция настройки игры
 
 				if (event_opt.key.code == Keyboard::Escape) Options.close();
 				if (event_opt.type == Event::Closed) Options.close();
-            }	
+            }
 
 
 			
@@ -359,7 +372,7 @@ void Options() // Функция настройки игры
 						else if (event_opt.text.unicode == 13) { 							// carriage return (enter)
 							
 						}
-						else if(inputed_name.size()<13){
+						else if(name.getLocalBounds().width < len_board_name - 60){
 							inputed_name += static_cast<char>(event_opt.text.unicode);
 						}
 						// if (inputed_name.size() == 1) {name.setString("Enter your name:");}
@@ -369,17 +382,21 @@ void Options() // Функция настройки игры
 			}
 			else if (OptionsMenuSelected == 1)
 			{
-				
-
-
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if(color_selected == 0) { color_selected = list_colors.size() - 1;}
+					else {--color_selected;}
+				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				exit.setFillColor(options_text_color); save.setFillColor(options_text_color); triangle[0].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 2)
 			{
-				
-
-
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if(color_selected == list_colors.size() - 1) {color_selected = 0;}
+					else {++color_selected;}
+				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				exit.setFillColor(options_text_color); save.setFillColor(options_text_color); triangle[1].setFillColor(chosen_color);
@@ -433,7 +450,7 @@ void Options() // Функция настройки игры
 				exit.setFillColor(options_text_color); save.setFillColor(chosen_color);
 			}
 
-
+			chose_color.setFillColor(list_colors.at(color_selected));
 
 
 
