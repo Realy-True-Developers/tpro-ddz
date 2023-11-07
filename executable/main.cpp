@@ -6,7 +6,7 @@ int main(){
     settings.antialiasingLevel = 8;
 
     // Объект, который, собственно, является главным окном приложения
-    sf::RenderWindow window(sf::VideoMode(600, 600), "Blyat!", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(600, 600), "Game", sf::Style::Default, settings);
 
     sf::RectangleShape Doodle(sf::Vector2f(120.f, 300.f));
     Doodle.setFillColor(sf::Color::Green);
