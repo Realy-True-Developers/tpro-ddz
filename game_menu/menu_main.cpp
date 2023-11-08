@@ -6,7 +6,6 @@ using namespace sf;
 int main()
 {
     setlocale(LC_ALL, "Rus");
-    setlocale(LC_ALL, "Rus");
 
     RenderWindow window;  // Создаём окно 
     window.create(VideoMode::getDesktopMode(), L"Doodle Jump", Style::Fullscreen);
@@ -26,7 +25,6 @@ int main()
 
     int left_pos = 150, top_pos = 350, step_pos = 150;
     game::StartMenu mymenu(window, left_pos, top_pos, step_pos, 4, name_menu, 100); // Объект игровое меню
-    // mymenu.setColorTextMenu(Color(237, 147, 0), Color::Red, Color::Black);          // Установка цвета элементов пунктов меню
     mymenu.AlignMenu(3);                                                            // Выравнивание по левому краю пунктов меню 
             
     while (window.isOpen())

@@ -3,17 +3,6 @@
 using namespace sf;
 
 
-
-// void game::setFillText(Text& text, String str, float xpos, float ypos) // Настройка текстовых объектов игрового меню
-// {
-// 	text.setString(str);                // Текст
-// 	text.setCharacterSize(size_font);   // Размер шрифта
-// 	text.setFont(font);                 // Шрифт
-// 	text.setPosition(xpos, ypos);       // Координаты текстового объекта
-// 	text.setFillColor(menu_text_color); // Цвет пункта меню
-// 	text.setOutlineColor(border_color);	// Цвет контура обводки текста
-// }
-
 // Нах оно надо, можно прописть это в main
 void game::StartMenu::AlignMenu(int posx) // Выравнивание пунктов меню по левому по правому по центру 
 {
@@ -87,6 +76,7 @@ void game::StartMenu::MoveKeyUp() // Перемещение выбора мен�
 	}
 }
 
+
 void game::StartMenu::MouseChosen(int chosen_point) 				// Выбор пункта меню мышкой
 {
 	mainMenuSelected = chosen_point;  
@@ -105,11 +95,6 @@ void game::StartMenu::draw() // Отрисовка каждого объекта
 }
 
 
-// void game::MenuSettings::draw() // Отрисовка каждого объекта меню
-// {
-// 	for (int i = 0; i < max_menu; ++i) mywindow.draw(settingsMenu[i]);
-// }
-
 
 void game::StartMenu::setColorTextMenu(Color menColor, Color ChosenColor, Color BordColor) // Установка цвета элементов меню
 {
@@ -127,22 +112,6 @@ void game::StartMenu::setColorTextMenu(Color menColor, Color ChosenColor, Color 
 }
 
 
-// game::MenuSettings::MenuSettings(RenderWindow& window, float menux, float menuy, int step, int max_point_menu, String name[], int sizeFont)
-// 	:mywindow(window), menu_X(menux), menu_Y(menuy), menu_Step(step), size_font(sizeFont), max_menu(max_point_menu), settingsMenu(new Text[max_menu])
-// {
-// 	if (!font.loadFromFile("../../fonts/ArialRegular.ttf")) exit(1);	// Загрузка шрифта
-	
-// 	for (int i = 0, ypos = menu_Y; i < max_menu; ++i, ypos += menu_Step)
-// 	{
-// 		settingsMenu[i].setFont(font);
-// 		FillText(settingsMenu[i], menu_X, ypos, name[i], size_font, menu_text_color);
-// 	}
-
-// 	MenuSettingsSelected = 0;												// Задаём начальное положения выбраного пункта меню
-// 	settingsMenu[MenuSettingsSelected].setFillColor(chosen_text_color); 	// Подсвечиваем выбранный пункт меню
-// }
-
-
 void FillText(Text &mtext, float xpos, float ypos, String str, int size_font, Color text_color, int bord, Color border_color) // функция настройки текста
 {
 	mtext.setString(str);
@@ -152,18 +121,6 @@ void FillText(Text &mtext, float xpos, float ypos, String str, int size_font, Co
     mtext.setOutlineThickness(bord);
     mtext.setOutlineColor(border_color);
 }
-
-
-// void EnteringText(Text& text, float xpos, float ypos, int width, int height, String str, int size_font = 60, Color text_color = Color::White, 
-// int bord = 1, Color border_color = Color::Black)
-// {
-// 	text.setString(str);
-//     text.setCharacterSize(size_font);
-//     text.setPosition(xpos, ypos);
-//     text.setFillColor(text_color);
-//     text.setOutlineThickness(bord);
-//     text.setOutlineColor(border_color);
-// }
 
 
 void GameStart() // Функция запуска игры
@@ -194,8 +151,6 @@ void GameStart() // Функция запуска игры
 
 void Options(RenderWindow& window) // Функция настройки игры
 {
-    //RenderWindow Options;
-	//Options.create(VideoMode::getDesktopMode(), L"Options", Style::Fullscreen);
     RectangleShape options_back(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture options_texture;
 
@@ -218,8 +173,6 @@ void Options(RenderWindow& window) // Функция настройки игры
 	String settings_text[]{L"Your name", L"Color", L"Manipulation", L"Game field"};
 
 	float pos_y = 50, step = 200, pos_x = 50, exit_save_y = 900;
-
-	//game::MenuSettings settings(Options, pos_x, pos_y, step, 4, settings_text, 100);
 
 	for (int i = 0, ypos = pos_y; i < 4; ++i, ypos += step) 
 	{
@@ -307,8 +260,6 @@ void Options(RenderWindow& window) // Функция настройки игры
 	std::vector<Color> list_colors{Color::Black, Color::Red, Color::Green, Color::Blue, Color::Yellow};
 	int color_selected = 0;
 
-	// Event::TextEvent key_left, key_right;
-
 	int OptionsMenuSelected = 0;
 	std::string inputed_name;
 
@@ -356,16 +307,6 @@ void Options(RenderWindow& window) // Функция настройки игры
 				if (event_opt.key.code == Keyboard::Escape) window.close();
 				if (event_opt.type == Event::Closed) window.close();
             }
-
-
-			
-
-
-
-
-
-
-
 
 			if(OptionsMenuSelected == 0)
 			{
@@ -469,47 +410,15 @@ void Options(RenderWindow& window) // Функция настройки игры
 
 			chose_color.setFillColor(list_colors.at(color_selected));
 
-
-
-
-
-			
-            // else if (event_opt.type == Event::KeyReleased) // События выбора пунктов меню
-            // {
-            //     if (event_opt.key.code == Keyboard::Escape) {  }
-            //     if (event_opt.key.code == Keyboard::Left) {  }         // Нажатие на клавиатуре стрелки вверх
-            //     if (event_opt.key.code == Keyboard::Right) {  }     // Нажатие на клавиатуре стрелки вниз
-            //     if (event_opt.key.code == Keyboard::Enter)                             // Нажатие на клавиатуре клавиши Enter                     
-            //     {
-            //         switch (mymenu.getSelectedMenuNumber())                         // Переход на выбранный пункт меню
-            //         {
-            //         case 0:GameStart();   break;
-            //         case 1:Options();     break;
-            //         case 2:About_Game();  break;
-            //         case 3:window.close(); break;
-            //         }
-            //     }
-            // }
-
-		    // if (Mouse::isButtonPressed(Mouse::Left))
-		    // {
-			//     if (mymenu.mainMenuSelected == 0) {GameStart(); break;}
-			//     if (mymenu.mainMenuSelected == 1) {window.close(); Options(); break;}
-			//     if (mymenu.mainMenuSelected == 2) {About_Game(); break;}
-            //     if (mymenu.mainMenuSelected == 3) {window.close(); break;}
-		    // }
-
-            // if (event_opt.type == Event::Closed) Options.close(); // Переходит в главное меню по нажатию alt + f4
-            
         }
         window.clear();
 		window.draw(options_back);
-		for (size_t i = 0; i < 4; ++i){window.draw(settings_desc_text[i]);}
-		for (size_t i = 0; i < 4; ++i){window.draw(border_name[i]);}
+		for (size_t i = 0; i < 4; ++i)
+		{
+			window.draw(settings_desc_text[i]);window.draw(border_name[i]);
+			window.draw(triangle[i]);window.draw(manip_l[i]);window.draw(manip_r[i]);
+		}
 		window.draw(name); window.draw(left); window.draw(right);
-		for (size_t i = 0; i < 4; ++i){window.draw(triangle[i]);}
-		for (size_t i = 0; i < 4; ++i){window.draw(manip_l[i]);}
-		for (size_t i = 0; i < 4; ++i){window.draw(manip_r[i]);}
 		window.draw(chose_color);
 		window.draw(field_size);
 		window.draw(exit);
