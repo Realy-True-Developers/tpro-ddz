@@ -192,10 +192,10 @@ void GameStart() // Функция запуска игры
 }
 
 
-void Options() // Функция настройки игры
+void Options(RenderWindow& window) // Функция настройки игры
 {
-    RenderWindow Options;
-	Options.create(VideoMode::getDesktopMode(), L"Options", Style::Fullscreen);
+    //RenderWindow Options;
+	//Options.create(VideoMode::getDesktopMode(), L"Options", Style::Fullscreen);
     RectangleShape options_back(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture options_texture;
 
@@ -294,39 +294,49 @@ void Options() // Функция настройки игры
 
 	field_size.setPosition(chose_color.getPosition().x - 10, chose_color.getPosition().y + settings_desc_text[3].getPosition().y - settings_desc_text[1].getPosition().y - 20);
 	
+	Color manip_color = Color::Green;
+
+	Text key_left_text, key_right_text;
+	key_left_text.setFont(font); key_right_text.setFont(font); key_left_text.setFillColor(manip_color); key_right_text.setFillColor(manip_color); 
+	key_left_text.setString("<-"); key_right_text.setString("->");
+
+
+
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 
 	std::vector<Color> list_colors{Color::Black, Color::Red, Color::Green, Color::Blue, Color::Yellow};
 	int color_selected = 0;
 
+	// Event::TextEvent key_left, key_right;
+
 	int OptionsMenuSelected = 0;
 	std::string inputed_name;
 
-    while (Options.isOpen())
+    while (window.isOpen())
     {
         Event event_opt;
-        while (Options.pollEvent(event_opt))
+        while (window.pollEvent(event_opt))
         {
 
 			if(IntRect(border_name[0].getPosition().x,border_name[0].getPosition().y,border_name[1].getPosition().x - border_name[3].getPosition().x,
-			 border_name[2].getPosition().y - border_name[0].getPosition().y).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 0;}
+			 border_name[2].getPosition().y - border_name[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 0;}
             
-		    else if(IntRect(triangle[0].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 1;}
-			else if(IntRect(triangle[1].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 2;}
+		    else if(IntRect(triangle[0].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 1;}
+			else if(IntRect(triangle[1].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 2;}
 
 			else if(IntRect(manip_l[0].getPosition().x,manip_l[0].getPosition().y,manip_l[1].getPosition().x - manip_l[3].getPosition().x,
-			 manip_l[2].getPosition().y - manip_l[0].getPosition().y).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 3;}
+			 manip_l[2].getPosition().y - manip_l[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 3;}
 
 			else if(IntRect(manip_r[0].getPosition().x,manip_r[0].getPosition().y,manip_r[1].getPosition().x - manip_r[3].getPosition().x,
-			 manip_r[2].getPosition().y - manip_r[0].getPosition().y).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 4;}
+			 manip_r[2].getPosition().y - manip_r[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 4;}
 
-			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 5;}
-			else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 6;}	
+			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 5;}
+			else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 6;}	
 			else if(IntRect(exit.getPosition().x, exit.getPosition().y, exit.getLocalBounds().width,
-             exit.getLocalBounds().height + exit.getCharacterSize()/4).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 7;}
+             exit.getLocalBounds().height + exit.getCharacterSize()/4).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 7;}
 			
 			else if(IntRect(save.getPosition().x, save.getPosition().y, save.getLocalBounds().width,
-             save.getLocalBounds().height + save.getCharacterSize()/4).contains(Mouse::getPosition(Options))) {OptionsMenuSelected = 8;}
+             save.getLocalBounds().height + save.getCharacterSize()/4).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 8;}
 
 			else if (event_opt.type == Event::KeyPressed)
             {
@@ -343,8 +353,8 @@ void Options() // Функция настройки игры
 				if(event_opt.key.code == Keyboard::Right){++OptionsMenuSelected %=9;}
 				if(event_opt.key.code == Keyboard::Left){--OptionsMenuSelected %=9;}
 
-				if (event_opt.key.code == Keyboard::Escape) Options.close();
-				if (event_opt.type == Event::Closed) Options.close();
+				if (event_opt.key.code == Keyboard::Escape) window.close();
+				if (event_opt.type == Event::Closed) window.close();
             }
 
 
@@ -402,7 +412,7 @@ void Options() // Функция настройки игры
 				exit.setFillColor(options_text_color); save.setFillColor(options_text_color); triangle[1].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 3)
 			{
-
+				
 
 
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
@@ -434,7 +444,11 @@ void Options() // Функция настройки игры
 				exit.setFillColor(options_text_color); save.setFillColor(options_text_color);triangle[3].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 7)
 			{
-				
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					main();
+					window.close();
+				}
 				
 
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
@@ -442,7 +456,10 @@ void Options() // Функция настройки игры
 				exit.setFillColor(chosen_color); save.setFillColor(options_text_color);
 			} else if (OptionsMenuSelected == 8)
 			{
-				
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					
+				}
 				
 
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
@@ -485,20 +502,19 @@ void Options() // Функция настройки игры
             // if (event_opt.type == Event::Closed) Options.close(); // Переходит в главное меню по нажатию alt + f4
             
         }
-        Options.clear();
-		Options.draw(options_back);
-		for (size_t i = 0; i < 4; ++i){Options.draw(settings_desc_text[i]);}
-		//settings.draw();
-		for (size_t i = 0; i < 4; ++i){Options.draw(border_name[i]);}
-		Options.draw(name); Options.draw(left); Options.draw(right);
-		for (size_t i = 0; i < 4; ++i){Options.draw(triangle[i]);}
-		for (size_t i = 0; i < 4; ++i){Options.draw(manip_l[i]);}
-		for (size_t i = 0; i < 4; ++i){Options.draw(manip_r[i]);}
-		Options.draw(chose_color);
-		Options.draw(field_size);
-		Options.draw(exit);
-		Options.draw(save);
-        Options.display();
+        window.clear();
+		window.draw(options_back);
+		for (size_t i = 0; i < 4; ++i){window.draw(settings_desc_text[i]);}
+		for (size_t i = 0; i < 4; ++i){window.draw(border_name[i]);}
+		window.draw(name); window.draw(left); window.draw(right);
+		for (size_t i = 0; i < 4; ++i){window.draw(triangle[i]);}
+		for (size_t i = 0; i < 4; ++i){window.draw(manip_l[i]);}
+		for (size_t i = 0; i < 4; ++i){window.draw(manip_r[i]);}
+		window.draw(chose_color);
+		window.draw(field_size);
+		window.draw(exit);
+		window.draw(save);
+        window.display();
     }
 }
 

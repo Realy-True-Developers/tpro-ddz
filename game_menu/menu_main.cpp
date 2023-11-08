@@ -55,9 +55,9 @@ int main()
                 {
                     switch (mymenu.getSelectedMenuNumber())                         // Переход на выбранный пункт меню
                     {
-                    case 0:GameStart();   break;
-                    case 1:Options();     break;
-                    case 2:About_Game();  break;
+                    case 0:GameStart(); break;
+                    case 1:Options(window); break;
+                    case 2:About_Game(); break;
                     case 3:window.close(); break;
                     }
                 }
@@ -66,7 +66,7 @@ int main()
 		    if (Mouse::isButtonPressed(Mouse::Left))
 		    {
 			    if (mymenu.mainMenuSelected == 0) {GameStart(); break;}
-			    if (mymenu.mainMenuSelected == 1) {window.close(); Options(); break;}
+			    if (mymenu.mainMenuSelected == 1) {Options(window); break;}
 			    if (mymenu.mainMenuSelected == 2) {About_Game(); break;}
                 if (mymenu.mainMenuSelected == 3) {window.close(); break;}
 		    }

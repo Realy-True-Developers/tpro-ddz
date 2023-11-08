@@ -89,8 +89,10 @@ int bord = 0, Color border_color = Color::Black); // функция настро
 
 
 void About_Game();
-void Options(); 	// Функция настройки игры
+void Options(RenderWindow& window); 	// Функция настройки игры
 void GameStart();	// Функция запуска игры
+
+int main();
 
 // void EnteringText(Text& text, float xpos, float ypos, int width, int height, String str, int size_font = 60, Color text_color = Color::White, 
 // int bord = 1, Color border_color = Color::Black); // функция создания окошка для ввода текста с клавиатуры
