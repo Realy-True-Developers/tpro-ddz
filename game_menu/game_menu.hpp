@@ -22,7 +22,7 @@ namespace game
 		
         Text* mainMenu;             // Динамический массив текстовых объектов названий пунктов меню
 		Color menu_text_color = Color(192, 154, 76);		// Цвет пунктов меню
-		Color chosen_text_color =  Color(103,137,139);			// Цвет выбора пункта меню
+		Color chosen_text_color =  Color(103, 137, 139);			// Цвет выбора пункта меню
 		Color border_color = Color::Black;				// Цвет обводки текста пунктов меню
 
 		RenderWindow& mywindow;

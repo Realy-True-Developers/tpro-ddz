@@ -12,7 +12,7 @@ int main()
     RectangleShape background(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture texture_window;
 
-    if (!texture_window.loadFromFile("../../images/1.jpg")) exit(2); // Установка фона главного меню
+    if (!texture_window.loadFromFile("../../images/mainBackground.jpg")) exit(2); // Установка фона главного меню
     background.setTexture(&texture_window);
 
     Font font;
@@ -21,7 +21,7 @@ int main()
     Titul.setFont(font);
     
     FillText(Titul, 300, 10, L"Doodle Jump", 200, Color(133,101,33), 3, Color(79,60,19));       // Текст с названием игры
-    String name_menu[]{ L"Play", L"Options", L"About Game", L"Exit"};           // Название пунктов меню
+    String name_menu[]{ L"Play", L"Options", L"About Game", L"Exit"};                           // Название пунктов меню
 
     int left_pos = 170, top_pos = 300, step_pos = 180;
     Color borderColor = Color(83, 56, 0);
