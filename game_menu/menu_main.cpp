@@ -12,20 +12,21 @@ int main()
     RectangleShape background(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture texture_window;
 
-    if (!texture_window.loadFromFile("../../images/doodle_main.png")) exit(2); // Установка фона главного меню
+    if (!texture_window.loadFromFile("../../images/1.jpg")) exit(2); // Установка фона главного меню
     background.setTexture(&texture_window);
 
     Font font;
-    if (!font.loadFromFile("../../fonts/ArialRegular.ttf")) exit(3);           // Установка шрифта главного меню
+    if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);                  // Установка шрифта главного меню
     Text Titul;
     Titul.setFont(font);
     
-    FillText(Titul, 350, 50, L"Doodle Jump", 150, Color(237, 147, 0), 3);      // Текст с названием игры
-    String name_menu[]{ L"GameStart", L"Options", L"About Game", L"Exit"};     // Название пунктов меню
+    FillText(Titul, 300, 10, L"Doodle Jump", 200, Color(133,101,33), 3, Color(79,60,19));       // Текст с названием игры
+    String name_menu[]{ L"Play", L"Options", L"About Game", L"Exit"};           // Название пунктов меню
 
-    int left_pos = 150, top_pos = 350, step_pos = 150;
-    game::StartMenu mymenu(window, left_pos, top_pos, step_pos, 4, name_menu, 100); // Объект игровое меню
-    mymenu.AlignMenu(3);                                                            // Выравнивание по левому краю пунктов меню 
+    int left_pos = 170, top_pos = 300, step_pos = 180;
+    Color borderColor = Color(83, 56, 0);
+    game::StartMenu mymenu(window, left_pos, top_pos, step_pos, 4, name_menu, 2, borderColor, 110);  // Объект игровое меню
+    mymenu.AlignMenu(3);                                                             // Выравнивание по левому краю пунктов меню 
             
     while (window.isOpen())
     {

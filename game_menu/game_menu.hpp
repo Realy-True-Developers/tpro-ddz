@@ -21,13 +21,13 @@ namespace game
 
 		
         Text* mainMenu;             // Динамический массив текстовых объектов названий пунктов меню
-		Color menu_text_color = Color(237, 147, 0);		// Цвет пунктов меню
-		Color chosen_text_color =  Color::Red;			// Цвет выбора пункта меню
+		Color menu_text_color = Color(192, 154, 76);		// Цвет пунктов меню
+		Color chosen_text_color =  Color(103,137,139);			// Цвет выбора пункта меню
 		Color border_color = Color::Black;				// Цвет обводки текста пунктов меню
 
 		RenderWindow& mywindow;
 
-		StartMenu(RenderWindow& window, float menux, float menuy, int step, int max_point_menu, String name[], int sizeFont = 60); // Конструктор 
+		StartMenu(RenderWindow& window, float menux, float menuy, int step, int max_point_menu, String name[], int board, Color borderColor, int sizeFont = 60); // Конструктор 
        
 		~StartMenu() {delete[] mainMenu;}
 

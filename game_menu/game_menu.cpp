@@ -27,15 +27,15 @@ void game::StartMenu::AlignMenu(int posx) // Выравнивание пункт
 }
 
 
-game::StartMenu::StartMenu(RenderWindow& window, float menu_x, float menu_y, int step, int max_point_menu, String name[], int sizeFont) // Конструктор
+game::StartMenu::StartMenu(RenderWindow& window, float menu_x, float menu_y, int step, int max_point_menu, String name[], int board, Color borderColor, int sizeFont) // Конструктор
 	:mywindow(window), menu_X(menu_x), menu_Y(menu_y), menu_Step(step), size_font(sizeFont), max_menu(max_point_menu), mainMenu(new Text[max_menu])
 {
-	if (!font.loadFromFile("../../fonts/ArialRegular.ttf")) exit(1);	// Загрузка шрифта
+	if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(1);	// Загрузка шрифта
 
 	for (int i = 0, ypos = menu_Y; i < max_menu; ++i, ypos += menu_Step)
 	{
 		mainMenu[i].setFont(font);
-		FillText(mainMenu[i], menu_X, ypos, name[i], size_font, menu_text_color);
+		FillText(mainMenu[i], menu_X, ypos, name[i], size_font, menu_text_color, board, borderColor);
 	}
 
 	mainMenuSelected = 0;											// Задаём начальное положения выбраного пункта меню
