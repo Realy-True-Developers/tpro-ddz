@@ -50,4 +50,4 @@ void About_Game();
 void Options(RenderWindow& window); 	// Функция настройки игры
 void GameStart();	// Функция запуска игры
 
-int main();
+void MenuStart(RenderWindow& window);

@@ -235,7 +235,7 @@ void Options(RenderWindow& window) // Функция настройки игры
 	name.setFont(font); left.setFont(font); right.setFont(font); field_size.setFont(font);
 	name.setCharacterSize(60); left.setCharacterSize(80); right.setCharacterSize(80); field_size.setCharacterSize(80);
 	name.setFillColor(Color::Black); left.setFillColor(options_text_color); right.setFillColor(options_text_color); field_size.setFillColor(options_text_color);
-	name.setString(L"Enter your name"); left.setString(L"Left"); right.setString(L"Right"); field_size.setString(L"Normal");
+	name.setString(L"Enter your name"); left.setString(L"Left"); right.setString(L"Right");
 	name.setPosition(pos_x_board_name + 30, pos_y + 30);
 	left.setPosition(pos_x_board_name, settings_desc_text[2].getPosition().y + 20);
 	right.setPosition(pos_x_board_name + 350, settings_desc_text[2].getPosition().y + 20);
@@ -280,6 +280,9 @@ void Options(RenderWindow& window) // Функция настройки игры
 
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+
+	std::vector<std::string> list_field_size{"Small", "Normal", "Large"};
+	int field_selected = 1;
 
 	std::vector<Color> list_colors{Color::Black, Color::Red, Color::Green, Color::Blue, Color::Yellow};
 	int color_selected = 0;
@@ -341,15 +344,13 @@ void Options(RenderWindow& window) // Функция настройки игры
 					{
 						if (event_opt.text.unicode == 8 && inputed_name.size() > 0) { 		// Нажатие backspace
 							inputed_name.erase(inputed_name.size() - 1);
-						} else if (event_opt.text.unicode == 8){}
-						else if (event_opt.text.unicode == 13) { 							// carriage return (enter)
-							
-						}
-						else if(name.getLocalBounds().width < len_board_name - 70){
+						} else if (event_opt.text.unicode == 8) {}
+						else if (event_opt.text.unicode == 13) {}							// carriage return (enter)	
+						else if(name.getLocalBounds().width < len_board_name - 70) {
 							inputed_name += static_cast<char>(event_opt.text.unicode);
 						}
-						// if (inputed_name.size() == 1) {name.setString("Enter your name:");}
 						name.setString(inputed_name);
+						// if (inputed_name.size() == 1) {name.setString("Enter your name:");}
 					}
 				}
 			}
@@ -376,8 +377,9 @@ void Options(RenderWindow& window) // Функция настройки игры
 			} else if (OptionsMenuSelected == 3)
 			{
 				if (event_opt.type == Event::TextEntered) {
-					if(event_opt.text.unicode < 128) {
-						// if (inputed_name.size() == 1) {key_left_text.setString("Enter your name:");}
+					if (event_opt.text.unicode == 8) {}			// Backspace
+					else if (event_opt.text.unicode == 13) {} 	// Enter
+					else if(event_opt.text.unicode < 128) {
 						inputed_l = toupper(static_cast<char>(event_opt.text.unicode));
 						if(inputed_l != key_right_text.getString())
 							key_left_text.setString(inputed_l);
@@ -389,30 +391,34 @@ void Options(RenderWindow& window) // Функция настройки игры
 			} else if (OptionsMenuSelected == 4)
 			{
 				if (event_opt.type == Event::TextEntered) {
-					if (event_opt.text.unicode < 128) {
-						
+					if (event_opt.text.unicode == 8) {}			// Backspace
+					else if (event_opt.text.unicode == 13) {} 	// Enter
+					else if (event_opt.text.unicode < 128) {
 						inputed_r = toupper(static_cast<char>(event_opt.text.unicode));
-						// if (inputed_name.size() == 1) {key_left_text.setString("Enter your name:");}
 						if(inputed_r != key_left_text.getString())
 							key_right_text.setString(inputed_r);
 					}
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(chosen_color);
-				save.setFillColor(options_text_color); triangle[i].setFillColor(color_border);}
+				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color);
 			} else if (OptionsMenuSelected == 5)
 			{
-				
-				
-
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if(field_selected == 0) {}
+					else {--field_selected;}
+				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				save.setFillColor(options_text_color);triangle[2].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 6)
 			{
-				
-				
-
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if(field_selected == list_field_size.size() - 1) {}
+					else {++field_selected;}
+				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				save.setFillColor(options_text_color);triangle[3].setFillColor(chosen_color);
@@ -420,20 +426,20 @@ void Options(RenderWindow& window) // Функция настройки игры
 			{
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
-					main();
-					window.close();
+					MenuStart(window);
 				}
-				
-
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				save.setFillColor(chosen_color);
 			}
 
-			// буквы в управлении не были одинаковыми!
-
-
+			field_size.setString(list_field_size.at(field_selected));
 			chose_color.setFillColor(list_colors.at(color_selected));
+
+			if (chosen_player == 1) 
+				{players1.setFillColor(chosen_color); players2.setFillColor(color_players);}
+			else
+				{players1.setFillColor(color_players); players2.setFillColor(chosen_color);}
 
         }
         window.clear();

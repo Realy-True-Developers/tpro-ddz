@@ -2,13 +2,22 @@
 #include <Windows.h>
 using namespace sf;
 
-
 int main()
+{
+    RenderWindow window;  // Создаём окно 
+    window.create(VideoMode::getDesktopMode(), L"Doodle Jump", Style::Fullscreen);
+
+    MenuStart(window);
+
+    return 0;
+}
+
+
+void MenuStart(RenderWindow& window)
 {
     setlocale(LC_ALL, "Rus");
 
-    RenderWindow window;  // Создаём окно 
-    window.create(VideoMode::getDesktopMode(), L"Doodle Jump", Style::Fullscreen);
+
     RectangleShape background(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture texture_window;
 
@@ -76,6 +85,4 @@ int main()
         mymenu.draw();
         window.display();
     }
-    
-    return 0;
 }
