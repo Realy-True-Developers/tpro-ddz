@@ -1,7 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <thread>
 #include <random>
-
 #include "../game_menu/game_menu.hpp"
 
 int main(){
