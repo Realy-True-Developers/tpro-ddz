@@ -74,7 +74,15 @@ void MenuStart(RenderWindow& window)
 		    if (Mouse::isButtonPressed(Mouse::Left))
 		    {
 			    if (mymenu.mainMenuSelected == 0) {GameStart(); break;}
-			    if (mymenu.mainMenuSelected == 1) {Options(window); break;}
+			    if (mymenu.mainMenuSelected == 1)
+                {
+                    Options(window, 1); 
+                    // window.setActive(false);
+                    // Thread OptionsThread(Options, std::ref(window));
+                    // OptionsThread.launch();
+                    // OptionsThread.wait();
+                    // window.setActive(true);
+                }
 			    if (mymenu.mainMenuSelected == 2) {About_Game(); break;}
                 if (mymenu.mainMenuSelected == 3) {window.close(); break;}
 		    }

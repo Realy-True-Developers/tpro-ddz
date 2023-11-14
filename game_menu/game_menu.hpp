@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
 #include <vector>
 using namespace sf;
 
@@ -45,9 +46,11 @@ namespace game
 void FillText(Text& mtext, float xpos, float ypos, String str, int size_font = 60, Color text_color = Color::White, 
 int bord = 0, Color border_color = Color::Black); // функция настройки текста
 
+std::vector<std::string> GetSettings(const char* file);
+void SaveSattings(const char* file, std::vector<std::string> settings);
 
 void About_Game();
-void Options(RenderWindow& window); 	// Функция настройки игры
+void Options(RenderWindow& window, int player_func_call = 1); 	// Функция настройки игры
 void GameStart();	// Функция запуска игры
 
 void MenuStart(RenderWindow& window);

@@ -148,13 +148,78 @@ void GameStart() // Функция запуска игры
     }
 }
 
+std::vector<std::string> GetSettings(const char* file)	//Функция получения данных из файла
+{
+    std::ifstream configFile(file);
 
-void Options(RenderWindow& window) // Функция настройки игры
+    if (!configFile) {
+        std::cout << "Settings file error" << std::endl;
+        exit(404);
+    }
+
+    std::string line;
+	std::vector<std::string> settings;
+	std::string delim = ": ", token;
+    while (std::getline(configFile, line)) {
+		line.erase(0, line.find(delim) + delim.length());
+		settings.push_back(line);
+    }
+
+    configFile.close();
+
+    return settings;
+}
+
+// Функция для сохранения настроек игры в файл
+//Порядок переменных: name, color, control_l, control_r, field_size
+void SaveSattings(const char* file, std::vector<std::string> settings)
+{
+    std::ifstream configFile(file);
+    std::vector<std::string> lines; // Здесь хранятся строки файла
+
+    if (!configFile) {
+        std::cout << "Settings file error" << std::endl;
+    	exit(404);
+    }
+
+    std::string line;
+    while (std::getline(configFile, line)) {
+        lines.push_back(line);
+    }
+    configFile.close();
+
+    std::ofstream newConfigFile(file);
+    if (!newConfigFile) {
+        std::cout << "Enable to open settings file" << std::endl;
+    	exit(404);
+    }
+
+    for (const auto& line : lines) {
+        if (line.find("Name: ") != std::string::npos) {
+            newConfigFile << "Name: " << settings.at(0) <<std::endl;
+        }
+        else if(line.find("Color: ") != std::string::npos) {
+            newConfigFile << "Color: " << settings.at(1) <<std::endl;
+        }
+		else if(line.find("Control_left: ") != std::string::npos) {
+            newConfigFile << "Control_left: " << settings.at(2) <<std::endl;
+        }
+		else if(line.find("Control_right: ") != std::string::npos) {
+            newConfigFile << "Control_right: " << settings.at(3) <<std::endl;
+        }
+		else if(line.find("Field_size: ") != std::string::npos) {
+            newConfigFile << "Field_size: " << settings.at(4) <<std::endl;
+        }
+    }
+
+    newConfigFile.close();
+}
+
+
+void Options(RenderWindow& window, int player_func_call) // Функция настройки игры
 {
     RectangleShape options_back(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture options_texture;
-
-	int chosen_player = 1;
 
     if (!options_texture.loadFromFile("../../images/2.jpg")) exit(2);
     options_back.setTexture(&options_texture);
@@ -281,6 +346,8 @@ void Options(RenderWindow& window) // Функция настройки игры
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 
+	int chosen_player = player_func_call;
+
 	std::vector<std::string> list_field_size{"Small", "Normal", "Large"};
 	int field_selected = 1;
 
@@ -296,49 +363,81 @@ void Options(RenderWindow& window) // Функция настройки игры
         Event event_opt;
         while (window.pollEvent(event_opt))
         {
+			if(IntRect(players1.getPosition().x, players1.getPosition().y, players1.getSize().x, players1.getSize().y).contains(Mouse::getPosition(window)))
+			{OptionsMenuSelected = 0;}
 
-			if(IntRect(border_name[0].getPosition().x,border_name[0].getPosition().y,border_name[1].getPosition().x - border_name[3].getPosition().x,
-			 border_name[2].getPosition().y - border_name[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 0;}
+			else if(IntRect(players2.getPosition().x,players2.getPosition().y, players2.getSize().x, players2.getSize().y).contains(Mouse::getPosition(window)))
+			{OptionsMenuSelected = 1;}
+
+			else if(IntRect(border_name[0].getPosition().x,border_name[0].getPosition().y,border_name[1].getPosition().x - border_name[3].getPosition().x,
+			 border_name[2].getPosition().y - border_name[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 2;}
             
-		    else if(IntRect(triangle[0].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 1;}
-			else if(IntRect(triangle[1].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 2;}
+		    else if(IntRect(triangle[0].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 3;}
+			else if(IntRect(triangle[1].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 4;}
 
 			else if(IntRect(manip_l[0].getPosition().x,manip_l[0].getPosition().y,manip_l[1].getPosition().x - manip_l[3].getPosition().x,
-			 manip_l[2].getPosition().y - manip_l[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 3;}
+			 manip_l[2].getPosition().y - manip_l[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 5;}
 
 			else if(IntRect(manip_r[0].getPosition().x,manip_r[0].getPosition().y,manip_r[1].getPosition().x - manip_r[3].getPosition().x,
-			 manip_r[2].getPosition().y - manip_r[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 4;}
+			 manip_r[2].getPosition().y - manip_r[0].getPosition().y).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 6;}
 
-			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 5;}
-			else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 6;}	
+			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 7;}
+			else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 8;}	
 			else if(IntRect(save.getPosition().x, save.getPosition().y, save.getLocalBounds().width,
-             save.getLocalBounds().height + save.getCharacterSize()/4).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 7;}
+             save.getLocalBounds().height + save.getCharacterSize()/4).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 9;}
 
 			else if (event_opt.type == Event::KeyPressed)
             {
 				if(event_opt.key.code == Keyboard::Up)
 				{ switch (OptionsMenuSelected)
-					{case 0: OptionsMenuSelected=8; break; case 1: OptionsMenuSelected=0; break; case 2: OptionsMenuSelected=0; break;
-					case 3: OptionsMenuSelected=1; break; case 4: OptionsMenuSelected=2; break; case 5: OptionsMenuSelected=3; break;
-					case 6: OptionsMenuSelected=4; break; case 7: OptionsMenuSelected=5; break; case 8: OptionsMenuSelected=5; break; } }
+					{case 2: OptionsMenuSelected=9; break; case 3: OptionsMenuSelected=2; break; case 4: OptionsMenuSelected=2; break;
+					case 5: OptionsMenuSelected=3; break; case 6: OptionsMenuSelected=4; break; case 7: OptionsMenuSelected=5; break;
+					case 8: OptionsMenuSelected=6; break; case 9: OptionsMenuSelected=7; break; case 0: OptionsMenuSelected=9; break;
+					case 1: OptionsMenuSelected=9; break;} }
 				if(event_opt.key.code == Keyboard::Down)
 				{ switch (OptionsMenuSelected)
-					{case 0: OptionsMenuSelected=1; break; case 1: OptionsMenuSelected=3; break; case 2: OptionsMenuSelected=4; break;
-					case 3: OptionsMenuSelected=5; break; case 4: OptionsMenuSelected=6; break; case 5: OptionsMenuSelected=7; break;
-					case 6: OptionsMenuSelected=7; break; case 7: OptionsMenuSelected=0; break; case 8: OptionsMenuSelected=0; break; } }
-				if(event_opt.key.code == Keyboard::Right){++OptionsMenuSelected %=9;}
-				if(event_opt.key.code == Keyboard::Left){--OptionsMenuSelected %=9;}
+					{case 2: OptionsMenuSelected=3; break; case 3: OptionsMenuSelected=5; break; case 4: OptionsMenuSelected=6; break;
+					case 5: OptionsMenuSelected=7; break; case 6: OptionsMenuSelected=8; break; case 7: OptionsMenuSelected=9; break;
+					case 8: OptionsMenuSelected=9; break; case 9: OptionsMenuSelected=2; break; case 0: OptionsMenuSelected=2; break;
+					case 1: OptionsMenuSelected=2; break;} }
+				if(event_opt.key.code == Keyboard::Right){++OptionsMenuSelected %=10;}
+				if(event_opt.key.code == Keyboard::Left){--OptionsMenuSelected %=10;}
 
 				if (event_opt.key.code == Keyboard::Escape) window.close();
 				if (event_opt.type == Event::Closed) window.close();
             }
 
-			if(OptionsMenuSelected == 0)
+
+			if (OptionsMenuSelected == 0)
+			{
+				chosen_player = 1;
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if (chosen_player != player_func_call)
+						Options(window, 1);
+				}
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);manip_l[i].setFillColor(color_border);
+				manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color);
+				triangle[0].setFillColor(color_border);
+			}
+			else if (OptionsMenuSelected == 1)
+			{
+				chosen_player = 2;
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if (chosen_player != player_func_call)
+						Options(window, 2);
+				}
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
+				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
+				save.setFillColor(options_text_color); triangle[0].setFillColor(color_border);
+			}
+			else if(OptionsMenuSelected == 2)
 			{
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(chosen_color);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);
 				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color); 
-				if (event_opt.type == Event::TextEntered) 
+				if (event_opt.type == Event::TextEntered)
 				{
 					if (event_opt.text.unicode < 128) 
 					{
@@ -354,7 +453,7 @@ void Options(RenderWindow& window) // Функция настройки игры
 					}
 				}
 			}
-			else if (OptionsMenuSelected == 1)
+			else if (OptionsMenuSelected == 3)
 			{
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
@@ -364,7 +463,7 @@ void Options(RenderWindow& window) // Функция настройки игры
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				save.setFillColor(options_text_color); triangle[0].setFillColor(chosen_color);
-			} else if (OptionsMenuSelected == 2)
+			} else if (OptionsMenuSelected == 4)
 			{
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
@@ -374,7 +473,7 @@ void Options(RenderWindow& window) // Функция настройки игры
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				save.setFillColor(options_text_color); triangle[1].setFillColor(chosen_color);
-			} else if (OptionsMenuSelected == 3)
+			} else if (OptionsMenuSelected == 5)
 			{
 				if (event_opt.type == Event::TextEntered) {
 					if (event_opt.text.unicode == 8) {}			// Backspace
@@ -388,7 +487,7 @@ void Options(RenderWindow& window) // Функция настройки игры
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(chosen_color); manip_r[i].setFillColor(color_border);
 				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color); 
-			} else if (OptionsMenuSelected == 4)
+			} else if (OptionsMenuSelected == 6)
 			{
 				if (event_opt.type == Event::TextEntered) {
 					if (event_opt.text.unicode == 8) {}			// Backspace
@@ -402,7 +501,7 @@ void Options(RenderWindow& window) // Функция настройки игры
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(chosen_color);
 				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color);
-			} else if (OptionsMenuSelected == 5)
+			} else if (OptionsMenuSelected == 7)
 			{
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
@@ -412,7 +511,7 @@ void Options(RenderWindow& window) // Функция настройки игры
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				save.setFillColor(options_text_color);triangle[2].setFillColor(chosen_color);
-			} else if (OptionsMenuSelected == 6)
+			} else if (OptionsMenuSelected == 8)
 			{
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
@@ -422,10 +521,21 @@ void Options(RenderWindow& window) // Функция настройки игры
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
 				save.setFillColor(options_text_color);triangle[3].setFillColor(chosen_color);
-			} else if (OptionsMenuSelected == 7)
+			} else if (OptionsMenuSelected == 9)
 			{
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
+					std::string color = std::to_string(color_selected);
+					std::vector<std::string> data_save;
+					data_save.push_back(inputed_name); data_save.push_back(color); data_save.push_back(inputed_l);
+					data_save.push_back(inputed_r); data_save.push_back(list_field_size.at(field_selected));
+					if(chosen_player == 1)
+					{
+						SaveSattings("../../SystemFiles/settingsP1.cfg", data_save);
+					} else {
+						SaveSattings("../../SystemFiles/settingsP2.cfg", data_save);
+					}
+					
 					MenuStart(window);
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
@@ -438,7 +548,7 @@ void Options(RenderWindow& window) // Функция настройки игры
 
 			if (chosen_player == 1) 
 				{players1.setFillColor(chosen_color); players2.setFillColor(color_players);}
-			else
+			else if (chosen_player == 2)
 				{players1.setFillColor(color_players); players2.setFillColor(chosen_color);}
 
         }
@@ -458,6 +568,8 @@ void Options(RenderWindow& window) // Функция настройки игры
 		window.draw(save);
         window.display();
     }
+	
+	// for(int i = 0; i < 5; ++i) std::cout << GetSettings("../../SystemFiles/settingsP1.cfg").at(i) << std::endl;
 }
 
 
@@ -486,3 +598,4 @@ void About_Game() // Функция с описанием игры
         About.display();
     }
 }
+
