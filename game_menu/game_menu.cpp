@@ -27,7 +27,7 @@ void game::StartMenu::AlignMenu(int posx) // Выравнивание пункт
 }
 
 
-game::StartMenu::StartMenu(RenderWindow& window, float menu_x, float menu_y, int step, int max_point_menu, String name[], int board, Color borderColor, int sizeFont) // Конструктор
+game::StartMenu::StartMenu(RenderWindow& window, float menu_x, float menu_y, int step, int max_point_menu, String name[], int board, Color borderColor, int start_menu_point, int sizeFont) // Конструктор
 	:mywindow(window), menu_X(menu_x), menu_Y(menu_y), menu_Step(step), size_font(sizeFont), max_menu(max_point_menu), mainMenu(new Text[max_menu])
 {
 	if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(1);	// Загрузка шрифта
@@ -38,7 +38,7 @@ game::StartMenu::StartMenu(RenderWindow& window, float menu_x, float menu_y, int
 		FillText(mainMenu[i], menu_X, ypos, name[i], size_font, menu_text_color, board, borderColor);
 	}
 
-	mainMenuSelected = 0;											// Задаём начальное положения выбраного пункта меню
+	mainMenuSelected = start_menu_point;
 	mainMenu[mainMenuSelected].setFillColor(chosen_text_color); 	// Подсвечиваем выбранный пункт меню
 }
 
@@ -123,32 +123,33 @@ void FillText(Text &mtext, float xpos, float ypos, String str, int size_font, Co
 }
 
 
-void GameStart() // Функция запуска игры
+void GameStart(RenderWindow& window) // Функция запуска игры
 {
-    RenderWindow Play(VideoMode::getDesktopMode(), L"Уровень 1", Style::Fullscreen);
     RectangleShape background_play(Vector2f(1920, 1080));
     Texture texture_play;
 
     if (!texture_play.loadFromFile("../../images/doodle_main.png")) exit(1);
     background_play.setTexture(&texture_play);
 
-    while (Play.isOpen())
+    while (window.isOpen())
     {
         Event event_play;
-        while (Play.pollEvent(event_play))
+        while (window.pollEvent(event_play))
         {
             if (event_play.type == Event::KeyPressed)
             {
-                if (event_play.key.code == Keyboard::Escape) { Play.close(); }
+                if (event_play.key.code == Keyboard::Escape) { window.close(); }
             }
         }
-        Play.clear();
-        Play.draw(background_play);
-        Play.display();
+        window.clear();
+        window.draw(background_play);
+        window.display();
     }
 }
 
-std::vector<std::string> GetSettings(const char* file)	//Функция получения данных из файла
+//Функция получения данных из файла
+//Порядок переменных: name, color, control_l, control_r, field_size
+std::vector<std::string> GetSettings(const char* file)	
 {
     std::ifstream configFile(file);
 
@@ -231,17 +232,17 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 	Font font;    
 	if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);
 
+	/*------------------------------------------------------------------------------------------------------------------------------------------*/
+
 	Text* settings_desc_text = new Text[4];
 	Text save;
 	save.setFont(font);
-
-	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 
 	String settings_text[]{L"Your name", L"Color", L"Control", L"Game field"}; 
 
 	float pos_y = 150, step = 200, pos_x = 50, exit_save_y = 900;
 
-	for (int i = 0, ypos = pos_y; i < 4; ++i, ypos += step) 
+	for (int i = 0, ypos = pos_y; i < 4; ++i, ypos += step)
 	{
 		settings_desc_text[i].setFont(font);
 		FillText(settings_desc_text[i], pos_x, ypos, settings_text[i], options_text_size, options_text_color, 1);
@@ -363,6 +364,13 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
         Event event_opt;
         while (window.pollEvent(event_opt))
         {
+			if (player_func_call == 1) 
+				{players1.setFillColor(chosen_color); players2.setFillColor(color_players);}
+			else if (player_func_call == 2)
+				{players1.setFillColor(color_players); players2.setFillColor(chosen_color);}
+
+
+
 			if(IntRect(players1.getPosition().x, players1.getPosition().y, players1.getSize().x, players1.getSize().y).contains(Mouse::getPosition(window)))
 			{OptionsMenuSelected = 0;}
 
@@ -403,10 +411,9 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 				if(event_opt.key.code == Keyboard::Right){++OptionsMenuSelected %=10;}
 				if(event_opt.key.code == Keyboard::Left){--OptionsMenuSelected %=10;}
 
-				if (event_opt.key.code == Keyboard::Escape) window.close();
+				if (event_opt.key.code == Keyboard::Escape) { MenuStart(window, 0); return;}
 				if (event_opt.type == Event::Closed) window.close();
             }
-
 
 			if (OptionsMenuSelected == 0)
 			{
@@ -434,6 +441,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 			}
 			else if(OptionsMenuSelected == 2)
 			{
+				chosen_player = player_func_call;
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(chosen_color);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);
 				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color); 
@@ -455,6 +463,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 			}
 			else if (OptionsMenuSelected == 3)
 			{
+				chosen_player = player_func_call;
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					if(color_selected == 0) { color_selected = list_colors.size() - 1;}
@@ -465,6 +474,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 				save.setFillColor(options_text_color); triangle[0].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 4)
 			{
+				chosen_player = player_func_call;
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					if(color_selected == list_colors.size() - 1) {color_selected = 0;}
@@ -475,6 +485,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 				save.setFillColor(options_text_color); triangle[1].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 5)
 			{
+				chosen_player = player_func_call;
 				if (event_opt.type == Event::TextEntered) {
 					if (event_opt.text.unicode == 8) {}			// Backspace
 					else if (event_opt.text.unicode == 13) {} 	// Enter
@@ -489,6 +500,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color); 
 			} else if (OptionsMenuSelected == 6)
 			{
+				chosen_player = player_func_call;
 				if (event_opt.type == Event::TextEntered) {
 					if (event_opt.text.unicode == 8) {}			// Backspace
 					else if (event_opt.text.unicode == 13) {} 	// Enter
@@ -503,6 +515,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color);
 			} else if (OptionsMenuSelected == 7)
 			{
+				chosen_player = player_func_call;
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					if(field_selected == 0) {}
@@ -513,6 +526,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 				save.setFillColor(options_text_color);triangle[2].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 8)
 			{
+				chosen_player = player_func_call;
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					if(field_selected == list_field_size.size() - 1) {}
@@ -523,6 +537,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 				save.setFillColor(options_text_color);triangle[3].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 9)
 			{
+				chosen_player = player_func_call;
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					std::string color = std::to_string(color_selected);
@@ -536,7 +551,8 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 						SaveSattings("../../SystemFiles/settingsP2.cfg", data_save);
 					}
 					
-					MenuStart(window);
+					MenuStart(window, 0);
+					return;
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
@@ -544,12 +560,12 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 			}
 
 			field_size.setString(list_field_size.at(field_selected));
-			chose_color.setFillColor(list_colors.at(color_selected));
+			chose_color.setFillColor(list_colors.at(color_selected)); 
 
-			if (chosen_player == 1) 
+			if(chosen_player == 1 && player_func_call == 2)
 				{players1.setFillColor(chosen_color); players2.setFillColor(color_players);}
-			else if (chosen_player == 2)
-				{players1.setFillColor(color_players); players2.setFillColor(chosen_color);}
+			else if (chosen_player == 2 && player_func_call == 1)
+				{players2.setFillColor(chosen_color); players1.setFillColor(color_players);}
 
         }
         window.clear();
@@ -568,12 +584,10 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 		window.draw(save);
         window.display();
     }
-	
-	// for(int i = 0; i < 5; ++i) std::cout << GetSettings("../../SystemFiles/settingsP1.cfg").at(i) << std::endl;
 }
 
-
-void About_Game() // Функция с описанием игры
+// Функция с описанием игры
+void About_Game()
 {
     RenderWindow About(VideoMode::getDesktopMode(), L"О игре", Style::Fullscreen);
     RectangleShape background_ab(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
@@ -599,3 +613,87 @@ void About_Game() // Функция с описанием игры
     }
 }
 
+void Exit(RenderWindow& window)
+{
+	Color buttons_color = Color::Black, buttons_chosen = Color::Red;
+
+	int exit_width = 800, exit_height = 300;
+	RectangleShape ExitShape;
+	ExitShape.setPosition(Vector2f(VideoMode::getDesktopMode().width/2 - exit_width/2, VideoMode::getDesktopMode().height/2 - exit_height/2));
+	ExitShape.setSize(Vector2f(exit_width, exit_height));
+	ExitShape.setFillColor(Color(234, 203, 166));
+	ExitShape.setOutlineThickness(5);
+	ExitShape.setOutlineColor(Color(167, 147, 123));
+
+	Font font;
+    if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);
+
+	Text exit_text("Do you want exit?", font, 75);
+	exit_text.setFillColor(Color::Black);
+	exit_text.setPosition(ExitShape.getPosition().x + (ExitShape.getLocalBounds().width - exit_text.getLocalBounds().width)/2, ExitShape.getPosition().y + 40);
+
+	Text exit_yes("Yes", font, 65);
+	exit_yes.setFillColor(buttons_color);
+	exit_yes.setPosition(ExitShape.getPosition().x + 100,
+	ExitShape.getPosition().y + ExitShape.getLocalBounds().height - exit_yes.getLocalBounds().height - 60);
+
+	Text exit_no("No", font, 65);
+	exit_no.setFillColor(buttons_chosen);
+	exit_no.setPosition(ExitShape.getPosition().x + ExitShape.getLocalBounds().width - 200,
+	ExitShape.getPosition().y + ExitShape.getLocalBounds().height - exit_no.getLocalBounds().height - 60);
+
+	int exit_selected = 1;
+
+	while (window.isOpen())
+    {
+        Event event_exit;
+        while (window.pollEvent(event_exit))
+        {
+			if (event_exit.type == Event::KeyReleased)
+            {
+                if (event_exit.key.code == Keyboard::Escape) {MenuStart(window, 3); return;}
+				if(event_exit.type == Event::Closed) window.close();
+			}
+
+			if(IntRect(exit_yes.getPosition().x, exit_yes.getPosition().y, exit_yes.getLocalBounds().width * 1.5,
+             exit_yes.getLocalBounds().height + exit_yes.getCharacterSize()/3).contains(Mouse::getPosition(window)))
+			{exit_selected = 0;}
+
+			else if(IntRect(exit_no.getPosition().x, exit_no.getPosition().y, exit_no.getLocalBounds().width * 1.5,
+             exit_no.getLocalBounds().height + exit_no.getCharacterSize()/3).contains(Mouse::getPosition(window)))
+			{exit_selected = 1;}
+
+			else if (event_exit.type == Event::KeyPressed)
+            {
+				if(event_exit.key.code == Keyboard::Right) ++exit_selected %=2;
+				if(event_exit.key.code == Keyboard::Left) {if(exit_selected==0) exit_selected = 1; else --exit_selected %=2;}
+            }
+
+
+
+			if (exit_selected == 0)
+			{
+				if(event_exit.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					window.close();
+				}
+			} else if (exit_selected == 1)
+			{
+				if(event_exit.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					MenuStart(window, 3); return;
+				}
+			}
+
+
+
+			if (exit_selected == 1)
+				{exit_no.setFillColor(buttons_chosen); exit_yes.setFillColor(buttons_color);}
+			else if (exit_selected == 0)
+				{exit_no.setFillColor(buttons_color); exit_yes.setFillColor(buttons_chosen);}
+		}
+		window.draw(ExitShape);
+		window.draw(exit_text); window.draw(exit_yes); window.draw(exit_no);
+		window.display();
+	}
+}
