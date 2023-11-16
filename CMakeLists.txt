@@ -5,8 +5,6 @@ set(CMAKE_CXX_STANDART 20)
 
 # set(CMAKE_MODULE_PATH "/usr/share/SFML/cmake/Modules/" ${CMAKE_MODULE_PATH}})
 
-# find_package(SFML 2.4.2 COMPONENTS graphics audio REQUIRED)
-
 set(SFML_STATIC_LIBRARIES TRUE)
 
 set(SFML_DIR "C:/Program Files/SFML-2.6.0/lib/cmake/SFML")
@@ -17,6 +15,8 @@ find_package(SFML 2.4.2 COMPONENTS graphics audio window system REQUIRED)
 
 add_executable(main executable/main.cpp)
 add_executable(menu game_menu/game_menu.cpp game_menu/menu_main.cpp)
+add_executable(platforms platforms/platforms.cpp platforms/platforms.hpp)
 
 target_link_libraries(menu sfml-graphics sfml-audio sfml-window sfml-system)
 target_link_libraries(main sfml-graphics sfml-audio sfml-window sfml-system)
+target_link_libraries(platforms sfml-graphics sfml-audio sfml-window sfml-system)

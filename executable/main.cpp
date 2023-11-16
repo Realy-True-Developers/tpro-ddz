@@ -1,8 +1,5 @@
-#include <SFML/Graphics.hpp>
-#include <thread>
-#include <random>
-
 #include "../game_menu/game_menu.hpp"
+#include "../platforms/platforms.cpp"
 
 int main(){
     sf::ContextSettings settings;
@@ -16,26 +13,23 @@ int main(){
     int WinSizeX = window.getSize().x;
     int WinSizeY = window.getSize().y; //Переменные размера окна, чтобы не вызвать постоянно функции
 
-    sf::RectangleShape pause(sf::Vector2f(WinSizeX,WinSizeY));
+    sf::RectangleShape pause(sf::Vector2f(WinSizeX, WinSizeY));
     pause.setFillColor(sf::Color(122,122,122,200));
     pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
-    sf::RectangleShape plat1(sf::Vector2f(150.f, 30.f));
-    sf::RectangleShape plat2(sf::Vector2f(150.f, 30.f));
-    sf::RectangleShape plat3(sf::Vector2f(150.f, 30.f));
-    sf::RectangleShape plat4(sf::Vector2f(150.f, 30.f));
-    sf::RectangleShape plat5(sf::Vector2f(150.f, 30.f));
+    platforms plat1(standart, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
+    platforms plat2(moving, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
+    platforms plat3(broken, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
+    platforms plat4(disappearing, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
+    platforms plat5(standart, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
 
-    sf::RectangleShape platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
+    //sf::RectangleShape plat1(sf::Vector2f(150.f, 30.f));
+    //sf::RectangleShape plat2(sf::Vector2f(150.f, 30.f));
+    //sf::RectangleShape plat3(sf::Vector2f(150.f, 30.f));
+    //sf::RectangleShape plat4(sf::Vector2f(150.f, 30.f));
+    //sf::RectangleShape plat5(sf::Vector2f(150.f, 30.f));
 
-    float x, y;
-    for (size_t i = 0; i < 5; ++i) {
-        platforms[i].setOrigin(platforms[i].getSize().x / 2, platforms[i].getSize().y / 2);
-        platforms[i].setFillColor(sf::Color::Cyan);
-        x = rand()%(WinSizeX-75);
-        y = rand()%(WinSizeY-15);
-        platforms[i].setPosition(x,y);
-    }
+    platforms platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
     
     sf::RectangleShape Doodle(sf::Vector2f(120.f, 150.f));
@@ -60,7 +54,7 @@ int main(){
                 sf::Event pauseEvent;
                 gamepause=true;
                 for (size_t i = 0; i < 5; ++i){
-                        window.draw(platforms[i]);
+                        platforms[i].Draw(window);
                     }
                     window.draw(Doodle);
                     window.draw(pause);
@@ -105,20 +99,23 @@ int main(){
 
         if (!isUp){ // дудл падает
             for (size_t i = 0; i < 5; ++i){
-                if ((platforms[i].getPosition().y-15<=DoodleY+75)&& //Нижний край дудла ниже верхнего края платформы
-                (DoodleY+75<=platforms[i].getPosition().y+15)&& //Нижний край дудла выше нижнего края платформы
-                (platforms[i].getPosition().x-75<DoodleX+60)&& 
-                (DoodleX-60<platforms[i].getPosition().x+75)){ //Дудл попадает на платформу хотя бы краем своего тела
+                if ((platforms[i]._coordY-15<=DoodleY+75)&& //Нижний край дудла ниже верхнего края платформы
+                (DoodleY+75<=platforms[i]._coordY+15)&& //Нижний край дудла выше нижнего края платформы
+                (platforms[i]._coordX-75<DoodleX+60)&& 
+                (DoodleX-60<platforms[i]._coordX+75)&& //Дудл попадает на платформу хотя бы краем своего тела
+                platforms[i]._type!=broken){ //Платформа не сломанная
                     isUp=true;
                     break;
                 }
             }
         }
 
+        
+
         window.clear(sf::Color(255, 255, 255));
 
         for (size_t i = 0; i < 5; ++i){
-            window.draw(platforms[i]);
+            platforms[i].Draw(window);
         }
 
         window.draw(Doodle);
