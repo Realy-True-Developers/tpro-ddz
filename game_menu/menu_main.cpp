@@ -1,6 +1,5 @@
 #include "game_menu.hpp"
-#include <Windows.h>
-using namespace sf;
+
 
 int main()
 {
@@ -61,20 +60,20 @@ void MenuStart(RenderWindow& window, int start_menu_point)
                 {
                     switch (mymenu.getSelectedMenuNumber())                         // Переход на выбранный пункт меню
                     {
-                    case 0: GameStart(window); return;
-                    case 1: Options(window, 1); return;
-                    case 2: About_Game(); return;
-                    case 3: Exit(window); return;
+                    case 0: sleep(milliseconds(300)); GameStart(window); return;
+                    case 1: sleep(milliseconds(300)); Options(window, 1); return;
+                    case 2: sleep(milliseconds(300)); About_Game(); return;
+                    case 3: sleep(milliseconds(300)); Exit(window); return;
                     }
                 }
             }
 
 		    if (Mouse::isButtonPressed(Mouse::Left))
 		    {
-			    if (mymenu.mainMenuSelected == 0) {GameStart(window); return;}
-			    if (mymenu.mainMenuSelected == 1) {Options(window, 1); return;}
-			    if (mymenu.mainMenuSelected == 2) {About_Game(); return;}
-                if (mymenu.mainMenuSelected == 3) {Exit(window); return;}
+			    if (mymenu.mainMenuSelected == 0) {sleep(milliseconds(300)); GameStart(window); return;}
+			    if (mymenu.mainMenuSelected == 1) {sleep(milliseconds(300)); Options(window, 1); return;}
+			    if (mymenu.mainMenuSelected == 2) {sleep(milliseconds(300)); About_Game(); return;}
+                if (mymenu.mainMenuSelected == 3) {sleep(milliseconds(300)); Exit(window); return;}
 		    }
         }
         window.clear();
