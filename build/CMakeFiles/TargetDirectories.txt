@@ -1,4 +1,0 @@
-C:/Users/Legion/Desktop/tpro-ddz/build/CMakeFiles/main.dir
-C:/Users/Legion/Desktop/tpro-ddz/build/CMakeFiles/menu.dir
-C:/Users/Legion/Desktop/tpro-ddz/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Legion/Desktop/tpro-ddz/build/CMakeFiles/ZERO_CHECK.dir
