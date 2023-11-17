@@ -31,4 +31,5 @@ public:
     float _coordX, _coordY;
     sf::Color _color;
     bool IsRight;
+    bool IsJumped;
 };

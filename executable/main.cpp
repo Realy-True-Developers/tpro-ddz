@@ -17,11 +17,11 @@ int main(){
     pause.setFillColor(sf::Color(122,122,122,200));
     pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
-    platforms plat1(standart, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
-    platforms plat2(moving, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
-    platforms plat3(broken, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
-    platforms plat4(disappearing, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
-    platforms plat5(standart, rand()%(WinSizeX-75), rand()%(WinSizeY-15));
+    platforms plat1(standart, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
+    platforms plat2(moving, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
+    platforms plat3(broken, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
+    platforms plat4(disappearing, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
+    platforms plat5(standart, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
 
     //sf::RectangleShape plat1(sf::Vector2f(150.f, 30.f));
     //sf::RectangleShape plat2(sf::Vector2f(150.f, 30.f));
@@ -105,6 +105,9 @@ int main(){
                 (DoodleX-60<platforms[i]._coordX+75)&& //Дудл попадает на платформу хотя бы краем своего тела
                 platforms[i]._type!=broken){ //Платформа не сломанная
                     isUp=true;
+                    if (platforms[i]._type==disappearing){
+                        platforms[i].IsJumped=true;
+                    }
                     break;
                 }
             }
