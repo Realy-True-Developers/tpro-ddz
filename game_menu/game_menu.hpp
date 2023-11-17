@@ -55,3 +55,4 @@ void GameStart(RenderWindow& window);	// Функция запуска игры
 void Options(RenderWindow& window, int player_func_call = 1); 	// Функция настройки игры
 void About_Game();
 void Exit(RenderWindow& Window);
+void Play(RenderWindow& window);
