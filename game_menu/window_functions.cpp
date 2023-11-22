@@ -9,7 +9,79 @@ void GameStart(RenderWindow& window) // Функция запуска игры
     if (!texture_play.loadFromFile("../../images/2+.jpg")) exit(1);
     background_play.setTexture(&texture_play);
 
+	Font font;    
+	if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);
 	
+	/*-------------------------------------------------------------------------------------------------------*/
+
+	Text rounds_text, count_bots_text;
+	rounds_text.setFont(font); count_bots_text.setFont(font);
+
+	Color gamestart_text_color = Color(119,144,145);
+	Color color_border = Color::Color(215, 189, 158), outline_color_border = Color(167, 147, 123);
+	Color play_color = Color::Blue, exit_color = Color(119,144,145);
+	Color chosen_color = Color(192, 154, 76);
+	Color input_color = Color::Red;
+
+	int max_rounds = 13, max_bots = 3;
+
+	int pos_y = 100, step = 200, pos_x_rounds = 500, pos_x_bots = 100;
+
+	FillText(rounds_text, pos_x_rounds, pos_y, "Rounds", 100, gamestart_text_color, 1);
+	FillText(count_bots_text, pos_x_bots, pos_y + 350, "Count bots", 100, gamestart_text_color, 1);
+
+	int pos_x_move_rounds = rounds_text.getLocalBounds().width + 300;
+	int pos_x_move_bots = count_bots_text.getLocalBounds().width + 300;
+	int len_rounds = 200, triangle_width = 50, triangle_height = 90;
+
+	ConvexShape* triangle = new ConvexShape[4];
+	for (size_t i = 0; i < 4; ++i)
+	{triangle[i].setPointCount(3); triangle[i].setFillColor(color_border);}
+	triangle[0].setPoint(0, Vector2f(pos_x_rounds + pos_x_move_rounds + triangle_width * 2, rounds_text.getPosition().y + 20));
+	triangle[0].setPoint(1, Vector2f(pos_x_rounds + pos_x_move_rounds + triangle_width, rounds_text.getPosition().y + triangle_height/2 + 20));
+	triangle[0].setPoint(2, Vector2f(pos_x_rounds + pos_x_move_rounds + triangle_width * 2, rounds_text.getPosition().y + triangle_height + 20));
+	triangle[0].setOutlineThickness(1); triangle[0].setOutlineColor(outline_color_border);
+
+	triangle[1].setPoint(0, Vector2f(len_rounds + pos_x_rounds + pos_x_move_rounds + triangle_width * 3, rounds_text.getPosition().y + triangle_height/2 + 20));
+	triangle[1].setPoint(1, Vector2f(len_rounds + pos_x_rounds + pos_x_move_rounds + triangle_width * 2, rounds_text.getPosition().y + 20));
+	triangle[1].setPoint(2, Vector2f(len_rounds + pos_x_rounds + pos_x_move_rounds + triangle_width * 2, rounds_text.getPosition().y + triangle_height + 20));
+	triangle[1].setOutlineThickness(1); triangle[1].setOutlineColor(outline_color_border);
+
+	triangle[2].setPoint(0,Vector2f(pos_x_bots + pos_x_move_bots + triangle_width * 2, count_bots_text.getPosition().y + 20));
+	triangle[2].setPoint(1,Vector2f(pos_x_bots + pos_x_move_bots + triangle_width, count_bots_text.getPosition().y + triangle_height/2 + 20));
+	triangle[2].setPoint(2,Vector2f(pos_x_bots + pos_x_move_bots + triangle_width * 2, count_bots_text.getPosition().y + triangle_height + 20));
+	triangle[2].setOutlineThickness(1); triangle[2].setOutlineColor(outline_color_border);
+
+	triangle[3].setPoint(0,Vector2f(len_rounds + pos_x_bots + pos_x_move_bots + triangle_width * 3, count_bots_text.getPosition().y + triangle_height/2 + 20));
+	triangle[3].setPoint(1,Vector2f(len_rounds + pos_x_bots + pos_x_move_bots + triangle_width * 2, count_bots_text.getPosition().y + 20));
+	triangle[3].setPoint(2,Vector2f(len_rounds + pos_x_bots + pos_x_move_bots + triangle_width * 2, count_bots_text.getPosition().y + triangle_height + 20));
+	triangle[3].setOutlineThickness(1); triangle[3].setOutlineColor(outline_color_border);
+	
+	Text exit, play;
+	exit.setFont(font); play.setFont(font);
+
+	int pos_y_exit = VideoMode::getDesktopMode().height - 300;
+
+	FillText(exit, pos_x_bots, pos_y_exit + 30, "Exit", 150, exit_color, 1);
+	FillText(play, VideoMode::getDesktopMode().width - 500, pos_y_exit, "Play", 200, play_color, 1);
+
+	Text rounds, bots;
+	rounds.setFont(font); bots.setFont(font);
+
+	FillText(rounds, 0, 0, "1", 100, input_color, 1);
+	FillText(bots, 0, 0, "1", 100, input_color, 1);
+
+	int pos_x_rounds_input = triangle[0].getLocalBounds().left + (triangle[1].getLocalBounds().left - triangle[0].getLocalBounds().left)/2 - rounds.getLocalBounds().width/2 + triangle_width*0.5;
+	int pos_x_bots_input = triangle[2].getLocalBounds().left + (triangle[3].getLocalBounds().left - triangle[2].getLocalBounds().left)/2 - bots.getLocalBounds().width/2 + triangle_width*0.5;
+
+	rounds.setPosition(pos_x_rounds_input, triangle[0].getLocalBounds().top - 15);
+	bots.setPosition(pos_x_bots_input, triangle[2].getLocalBounds().top - 15);
+
+	int rounds_input = 1, bots_input = 1;
+
+	/*-------------------------------------------------------------------------------------------------------*/
+
+	int GameStartSelected = 0;
 
     while (window.isOpen())
     {
@@ -18,11 +90,118 @@ void GameStart(RenderWindow& window) // Функция запуска игры
         {
             if (event_play.type == Event::KeyPressed)
             {
+				if (event_play.key.code == Keyboard::F4) { window.close(); }
                 if (event_play.key.code == Keyboard::Escape) {sleep(milliseconds(300)); MenuStart(window, 0); return;}
+				if (event_play.type == Event::Closed) window.close();
             }
+
+
+			if(IntRect(triangle[0].getLocalBounds()).contains(Mouse::getPosition(window))) {GameStartSelected = 0;}
+			else if(IntRect(triangle[1].getLocalBounds()).contains(Mouse::getPosition(window))) {GameStartSelected = 1;}
+			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(window))) {GameStartSelected = 2;}
+		    else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(window))) {GameStartSelected = 3;}
+			else if(IntRect(exit.getPosition().x, exit.getPosition().y, exit.getLocalBounds().width,
+             exit.getLocalBounds().height + exit.getCharacterSize()/4).contains(Mouse::getPosition(window))) {GameStartSelected = 4;}
+			else if(IntRect(play.getPosition().x, play.getPosition().y, play.getLocalBounds().width,
+             play.getLocalBounds().height + play.getCharacterSize()/4).contains(Mouse::getPosition(window))) {GameStartSelected = 5;}
+
+			else if (event_play.type == Event::KeyPressed)
+            {
+				if(event_play.key.code == Keyboard::Up)
+				{ switch (GameStartSelected)
+					{case 0: GameStartSelected = 5; break; case 1: GameStartSelected = 5; break; case 2: GameStartSelected = 0; break;
+					 case 3: GameStartSelected = 1; break; case 4: GameStartSelected = 2; break; case 5: GameStartSelected = 3; break;} }
+				if(event_play.key.code == Keyboard::Down)
+				{ switch (GameStartSelected)
+					{case 0: GameStartSelected = 2; break; case 1: GameStartSelected = 3; break; case 2: GameStartSelected = 5; break;
+					 case 3: GameStartSelected = 5; break; case 4: GameStartSelected = 0; break; case 5: GameStartSelected = 0; break;} }
+				if(event_play.key.code == Keyboard::Right){++GameStartSelected %= 6;}
+				if(event_play.key.code == Keyboard::Left){--GameStartSelected %= 6;}
+            }
+
+			if (GameStartSelected == 0)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if (rounds_input > 1)
+						{--rounds_input;}
+					else
+						{}
+				}
+				rounds.setString(std::to_string(rounds_input));
+				pos_x_rounds_input = triangle[0].getLocalBounds().left+(triangle[1].getLocalBounds().left-triangle[0].getLocalBounds().left)/2-rounds.getLocalBounds().width/2+triangle_width*0.5;
+				rounds.setPosition(pos_x_rounds_input, triangle[0].getLocalBounds().top - 15);
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(exit_color);
+				triangle[0].setFillColor(chosen_color); play.setFillColor(play_color);
+			}
+			else if (GameStartSelected == 1)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if (rounds_input == max_rounds)
+						{}
+					else
+						++rounds_input;
+				}
+				rounds.setString(std::to_string(rounds_input));
+				pos_x_rounds_input = triangle[0].getLocalBounds().left+(triangle[1].getLocalBounds().left-triangle[0].getLocalBounds().left)/2-rounds.getLocalBounds().width/2+triangle_width*0.5;
+				rounds.setPosition(pos_x_rounds_input, triangle[0].getLocalBounds().top - 15);
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(exit_color);
+				triangle[1].setFillColor(chosen_color); play.setFillColor(play_color);
+			}
+			else if(GameStartSelected == 2)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if (bots_input > 0)
+						{--bots_input;}
+					else
+						{}
+				}
+				bots.setString(std::to_string(bots_input));
+				pos_x_bots_input = triangle[2].getLocalBounds().left+(triangle[3].getLocalBounds().left-triangle[2].getLocalBounds().left)/2-bots.getLocalBounds().width/2+triangle_width*0.5;
+				bots.setPosition(pos_x_bots_input, triangle[2].getLocalBounds().top - 15);
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(exit_color);
+				triangle[2].setFillColor(chosen_color); play.setFillColor(play_color);
+			}
+			else if (GameStartSelected == 3)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					if (bots_input == max_bots)
+						{}
+					else
+						++bots_input;
+				}
+				bots.setString(std::to_string(bots_input));
+				pos_x_bots_input = triangle[2].getLocalBounds().left+(triangle[3].getLocalBounds().left-triangle[2].getLocalBounds().left)/2-bots.getLocalBounds().width/2+triangle_width*0.5;
+				bots.setPosition(pos_x_bots_input, triangle[2].getLocalBounds().top - 15);;
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(exit_color);
+				triangle[3].setFillColor(chosen_color); play.setFillColor(play_color);
+			} else if (GameStartSelected == 4)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					sleep(milliseconds(300)); MenuStart(window, 0); return;
+				}
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(chosen_color);
+				play.setFillColor(play_color);
+			} else if (GameStartSelected == 5)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					sleep(milliseconds(300)); Play(window); return;
+				}
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(exit_color);
+				play.setFillColor(chosen_color);
+			}
         }
         window.clear();
         window.draw(background_play);
+		window.draw(rounds_text); window.draw(count_bots_text);
+		for (size_t i = 0; i < 4; ++i) {window.draw(triangle[i]);}
+		window.draw(exit); window.draw(play);
+		window.draw(rounds); window.draw(bots);
         window.display();
     }
 }
@@ -510,4 +689,10 @@ void Exit(RenderWindow& window)
 		window.draw(exit_text); window.draw(exit_yes); window.draw(exit_no);
 		window.display();
 	}
+}
+
+
+void Play(RenderWindow& window)
+{
+
 }
