@@ -2,11 +2,14 @@
 #include "../platforms/platforms.cpp"
 
 int main(){
+    random_device rd;   // non-deterministic generator
+    mt19937 gen(rd());
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     
     bool gamepause=true; //Флаг паузы
-
+    bool WindowUp=false; //Подъём экрана поосле отскока от платформы
     // Объект, который, собственно, является главным окном приложения
     sf::RenderWindow window(sf::VideoMode(900, 1000), "Game", sf::Style::Default, settings);
 
@@ -17,11 +20,11 @@ int main(){
     pause.setFillColor(sf::Color(122,122,122,200));
     pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
-    platforms plat1(standart, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-    platforms plat2(moving, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-    platforms plat3(broken, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-    platforms plat4(disappearing, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-    platforms plat5(standart, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
+    platforms plat1(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), WinSizeY/5-15);
+    platforms plat2(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 2*WinSizeY/5-15);
+    platforms plat3(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 3*WinSizeY/5-15);
+    platforms plat4(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 4*WinSizeY/5-15);
+    platforms plat5(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), WinSizeY-15);
 
     //sf::RectangleShape plat1(sf::Vector2f(150.f, 30.f));
     //sf::RectangleShape plat2(sf::Vector2f(150.f, 30.f));
@@ -32,7 +35,7 @@ int main(){
     platforms platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
     
-    sf::RectangleShape Doodle(sf::Vector2f(120.f, 150.f));
+    sf::RectangleShape Doodle(sf::Vector2f(120., 150.));
     Doodle.setFillColor(sf::Color::Green);
     Doodle.setOrigin(sf::Vector2f(Doodle.getSize().x / 2, Doodle.getSize().y / 2)); //Создаём попрыгунчика, ставим центр его координат в центр прямоугольника
 
@@ -43,6 +46,9 @@ int main(){
 
     bool isUp=true; //флаг, показывает поднимается дудл или нет
     
+    int prevplatform;
+    float prevplatformheught;
+
     while (window.isOpen()){
         sf::Event event;
         while (window.pollEvent(event)){
@@ -77,19 +83,37 @@ int main(){
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
                 DoodleX+=0.07f;
             }
+
+        if (!WindowUp){
+            if(isUp)
+                DoodleY-=0.1f;
+            else if(!isUp)
+                DoodleY+=0.1f;
+        }
+        else{
+            if (isUp)
+                DoodleY-=0.05f;
+            else
+                DoodleY+=0.05f;
             
-        if(isUp)
-            DoodleY-=0.1f;
-        else
-            DoodleY+=0.1f;
+            for (size_t i = 0; i < 5; ++i){
+                platforms[i]._coordY+=0.1;
+            }
+            prevplatformheught+=0.1;
+            if(/*platforms[prevplatform]._coordY>WinSizeY-75*/prevplatformheught>WinSizeY-75){
+                WindowUp=false;
+            }
+        }
+
+        if(DoodleY<=WinSizeY/3-75)
+                isUp=false;
 
         if (DoodleX<=-Doodle.getSize().x/2)
             DoodleX=WinSizeX+Doodle.getSize().x/2-1;
         if(DoodleX>=WinSizeX+Doodle.getSize().x/2)
             DoodleX=-Doodle.getSize().x/2+1;
 
-        if(DoodleY<=Doodle.getSize().y/2)
-                isUp=false;
+        
         
         if(DoodleY>=WinSizeY+Doodle.getSize().y/2){
             goto gameover;
@@ -97,7 +121,7 @@ int main(){
      
         Doodle.setPosition(DoodleX, DoodleY);
 
-        if (!isUp){ // дудл падает
+        if (!isUp&&!WindowUp){ // дудл падает
             for (size_t i = 0; i < 5; ++i){
                 if ((platforms[i]._coordY-15<=DoodleY+75)&& //Нижний край дудла ниже верхнего края платформы
                 (DoodleY+75<=platforms[i]._coordY+15)&& //Нижний край дудла выше нижнего края платформы
@@ -105,6 +129,9 @@ int main(){
                 (DoodleX-60<platforms[i]._coordX+75)&& //Дудл попадает на платформу хотя бы краем своего тела
                 platforms[i]._type!=broken){ //Платформа не сломанная
                     isUp=true;
+                    WindowUp=true;
+                    prevplatformheught=platforms[i]._coordY;
+                    //prevplatform=i;
                     if (platforms[i]._type==disappearing){
                         platforms[i].IsJumped=true;
                     }
