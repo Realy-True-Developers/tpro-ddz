@@ -26,12 +26,6 @@ int main(){
     platforms plat4(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 4*WinSizeY/5-15);
     platforms plat5(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), WinSizeY-15);
 
-    //sf::RectangleShape plat1(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat2(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat3(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat4(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat5(sf::Vector2f(150.f, 30.f));
-
     platforms platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
     
@@ -46,7 +40,7 @@ int main(){
 
     bool isUp=true; //флаг, показывает поднимается дудл или нет
     
-    int prevplatform;
+    float prevplatformheught;
 
     while (window.isOpen()){
         sf::Event event;
@@ -98,8 +92,8 @@ int main(){
             for (size_t i = 0; i < 5; ++i){
                 platforms[i]._coordY+=0.1;
             }
-
-            if(platforms[prevplatform]._coordY>WinSizeY-75){
+            prevplatformheught+=0.1;
+            if(prevplatformheught>WinSizeY-75){
                 WindowUp=false;
             }
         }
@@ -129,7 +123,7 @@ int main(){
                 platforms[i]._type!=broken){ //Платформа не сломанная
                     isUp=true;
                     WindowUp=true;
-                    prevplatform=i;
+                    prevplatformheught=platforms[i]._coordY;
                     if (platforms[i]._type==disappearing){
                         platforms[i].IsJumped=true;
                     }
