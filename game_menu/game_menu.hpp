@@ -34,7 +34,7 @@ namespace game
 		int OutlineThickness = 3;	// Толщина контура обводки текста
 
         Text* mainMenu;             						// Динамический массив текстовых объектов названий пунктов меню
-		Color menu_text_color = Color(192, 154, 76);		// Цвет пунктов меню
+		Color menu_text_color = Color(102, 187, 19);		// Цвет пунктов меню
 		Color chosen_text_color =  Color(103, 137, 139);	// Цвет выбора пункта меню
 		Color border_color = Color::Black;					// Цвет обводки текста пунктов меню
 
@@ -54,12 +54,17 @@ namespace game
 	};		
 }
 
+// int CountLinesInFile(std::string filename);
+// int GetStringsFromFileS(std::string filename, std::string** _lines);
+// bool SetStringsToFileS(std::string filename, std::string* lines, int count);
+// bool SortStringsInFile(std::string filename);
 
 void FillText(Text& mtext, float xpos, float ypos, String str, int size_font = 60, Color text_color = Color::White, 
 int bord = 0, Color border_color = Color::Black); 
 
 std::vector<std::string> GetSettings(const char* file);
 void SaveSattings(const char* file, std::vector<std::string> settings);
+void SaveScore(const char* file, std::string name, int score);
 
 void MenuStart(RenderWindow& window, int start_menu_point);
 

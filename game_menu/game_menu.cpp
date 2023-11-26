@@ -243,3 +243,133 @@ void SaveSattings(const char* file, std::vector<std::string> settings)
 
     newConfigFile.close();
 }
+
+// int CountLinesInFile(std::string filename)
+// {
+//   	std::ifstream file(filename, std::ios::in);
+
+// 	if (!file)
+// 	{
+// 		return -1;
+// 	}
+// 	int count = 0;
+// 	char buffer[1000];
+
+// 	while (!file.eof())
+// 	{
+// 		count++;
+// 		file.getline(buffer, 1000);
+// 	}
+
+// 	file.close();
+// 	return count;
+// }
+
+// int GetStringsFromFileS(std::string filename, std::string** _lines)
+// {
+// 	std::string* lines; 					// временный список строк
+// 	int n = CountLinesInFile(filename); 	// Получить количество строк в файле
+
+// 	if (n == -1) return -1;
+
+// 	std::ifstream file(filename);
+// 	if (!file) exit(404);
+
+// 	try {
+// 		lines = new std::string[n];
+// 	}
+// 	catch (std::bad_alloc e)
+// 	{
+// 		file.close(); return -2; // возврат с кодом -2
+// 	}
+
+// 	std::string line;
+// 	std::string delim = ", ";
+
+// 	for (int i = 0; i < n; i++)
+// 	{
+// 		file.getline(line, 1000);
+
+// 		line.erase(0, line.find(delim) + delim.length());
+// 		lines.push_back(lines);
+
+// 		int len;
+// 		for (len = 0; buffer[len] != '\0'; len++);
+
+// 		lines[i].assign(buffer, len);
+// 	}
+// 	file.close();
+
+// 	*_lines = lines;
+// 	return n;
+// }
+
+// bool SetStringsToFileS(std::string filename, std::string* lines, int count)
+// {
+// 	std::ofstream file(filename);
+
+// 	if (!file) return false;
+
+// 	for (int i = 0; i < count - 1; i++)
+// 		file << lines[i] << std::endl;
+
+// 	file << lines[count - 1];
+
+// 	file.close();
+// 	return true;
+// }
+
+// bool SortStringsInFile(std::string filename)
+// {
+// 	int count;
+// 	std::string* lines = nullptr;
+// 	std::string s;
+
+// 	count = GetStringsFromFileS(filename, &lines);
+// 	if (count < 0) return false;
+
+// 	for (int i = 0; i < count - 1; i++)
+// 		for (int j = i; j >= 0; j--)
+// 		if (lines[j] > lines[j + 1])
+// 		{
+// 			s = lines[j];
+// 			lines[j] = lines[j + 1];
+// 			lines[j + 1] = s;
+// 		}
+
+// 	bool res = SetStringsToFileS(filename, lines, count);
+
+// 	if (lines != nullptr) delete[] lines;
+
+// 	return res;
+// }
+
+/*!
+* \brief Функция записи данных в файл, порядок переменных: name, color, control_l, control_r, field_size
+* \param[in] file Название файла
+* \param[in] bordesettingsr_color Вектор string с параметрами, которые необходимо записать в файл
+*/
+void SaveScore(const char* file, std::string name, int score)
+{
+    std::ofstream scoreFile(file);
+    std::vector<std::string> lines; // Здесь хранятся строки файла
+
+    if (!scoreFile) {
+        std::cout << "Score file error" << std::endl;
+    	exit(404);
+    }
+
+	scoreFile << name << ", " << score << std::endl;
+    scoreFile.close();
+
+    std::ifstream sortscoreFile(file);
+    if (!sortscoreFile) {
+        std::cout << "Score file error" << std::endl;
+    	exit(404);
+    }
+
+	// std::string line;
+    // while (std::getline(sortscoreFile, line)) {
+    //     lines.push_back(line);
+    // }
+}

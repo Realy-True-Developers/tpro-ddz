@@ -26,16 +26,16 @@ void MenuStart(RenderWindow& window, int start_menu_point)
     background.setTexture(&texture_window);
 
     Font font;
-    if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);                  // Установка шрифта главного меню
+    if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);                 	  // Установка шрифта главного меню
     Text Titul;
     Titul.setFont(font);
     
-    FillText(Titul, 300, 10, L"Doodle Jump", 200, Color(133,101,33), 3, Color(79,60,19));       // Текст с названием игры
-    String name_menu[]{ L"Play", L"Options", L"About Game", L"Exit"};                           // Название пунктов меню
+    FillText(Titul, 300, 10, L"Doodle Jump", 200, Color(170, 0, 0), 3, Color(79,60,19));       // Текст с названием игры
+    String name_menu[]{ L"Play", L"Options", L"About Game", L"Exit"};                          // Название пунктов меню
 
-    int left_pos = 170, top_pos = 300, step_pos = 180;
+    int left_pos = 170, top_pos = 300, step_pos = 190;
     Color borderColor = Color(83, 56, 0);
-    game::StartMenu mymenu(window, left_pos, top_pos, step_pos, 4, name_menu, 2, borderColor, start_menu_point,  110);  // Объект игровое меню
+    game::StartMenu mymenu(window, left_pos, top_pos, step_pos, 4, name_menu, 2, borderColor, start_menu_point,  120);  // Объект игровое меню
     mymenu.AlignMenu(3);                                                                                                // Выравнивание по левому краю пунктов меню 
 
     while (window.isOpen())
@@ -311,11 +311,17 @@ void Options(RenderWindow& window, int player_func_call)
     RectangleShape options_back(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture options_texture;
 
-    if (!options_texture.loadFromFile("../../images/2.jpg")) exit(2);
+    if (!options_texture.loadFromFile("../../images/background3.jpg")) exit(2);
     options_back.setTexture(&options_texture);
 
-	Color options_text_color = Color(119,144,145);
-	Color chosen_color = Color(192, 154, 76);
+	Color left_text_color = Color(103, 137, 139);
+	Color options_text_color = Color(30, 30, 30);
+	Color chosen_color = Color(192, 0, 0);
+	Color color_border = Color(192, 154, 76);
+	Color outline_color_border = Color(167, 147, 123);
+	Color color_players = Color(192, 154, 76);
+	Color chosen_color_players = Color(184, 160, 28);
+	Color chosing_var_color = Color(128, 128, 128); 	// Цвет клавиш для управления, имени и ширины игрового поля
 	int options_text_size = 110;
 
 	Font font;
@@ -327,23 +333,20 @@ void Options(RenderWindow& window, int player_func_call)
 	Text save;
 	save.setFont(font);
 
-	String settings_text[]{L"Your name", L"Color", L"Control", L"Game field"}; 
+	String settings_text[]{L"Your name", L"Color", L"Control", L"Game field"};
 
 	float pos_y = 150, step = 200, pos_x = 50, exit_save_y = 900;
 
 	for (int i = 0, ypos = pos_y; i < 4; ++i, ypos += step)
 	{
 		settings_desc_text[i].setFont(font);
-		FillText(settings_desc_text[i], pos_x, ypos, settings_text[i], options_text_size, options_text_color, 1);
+		FillText(settings_desc_text[i], pos_x, ypos, settings_text[i], options_text_size, left_text_color, 1);
 	}
 	
-	FillText(save, VideoMode::getDesktopMode().width - 850, exit_save_y, L"Save & Exit", 130, options_text_color);
-
-	Color color_border = Color::Color(215, 189, 158), outline_color_border = Color(167, 147, 123);
+	FillText(save, VideoMode::getDesktopMode().width - 850, exit_save_y, L"Save & Exit", 130, left_text_color);
 
 	RectangleShape players1, players2;
 	int border_players = 5, width_players = 400 + border_players * 3, height_players = 120;
-	Color color_players = Color(234, 203, 166), chosen_color_players = Color(184, 160, 28);
 
 	players1.setSize(Vector2f(width_players/2, height_players)); players2.setSize(Vector2f(width_players/2, height_players));
 	players1.setPosition(Vector2f(VideoMode::getDesktopMode().width/2 - width_players/2, 0));
@@ -389,7 +392,7 @@ void Options(RenderWindow& window, int player_func_call)
 	Text name, left, right, field_size;
 	name.setFont(font); left.setFont(font); right.setFont(font); field_size.setFont(font);
 	name.setCharacterSize(60); left.setCharacterSize(80); right.setCharacterSize(80); field_size.setCharacterSize(80);
-	name.setFillColor(Color::Black); left.setFillColor(options_text_color); right.setFillColor(options_text_color); field_size.setFillColor(options_text_color);
+	name.setFillColor(chosing_var_color); left.setFillColor(options_text_color); right.setFillColor(options_text_color); field_size.setFillColor(chosing_var_color);
 	name.setString(L"Enter your name"); left.setString(L"Left"); right.setString(L"Right");
 	name.setPosition(pos_x_board_name + 30, pos_y + 30);
 	left.setPosition(pos_x_board_name, settings_desc_text[2].getPosition().y + 20);
@@ -427,7 +430,7 @@ void Options(RenderWindow& window, int player_func_call)
 	Color manip_color = Color::Green;
 
 	Text key_left_text, key_right_text;
-	key_left_text.setFont(font); key_right_text.setFont(font); key_left_text.setFillColor(manip_color); key_right_text.setFillColor(manip_color); 
+	key_left_text.setFont(font); key_right_text.setFont(font); key_left_text.setFillColor(chosing_var_color); key_right_text.setFillColor(chosing_var_color); 
 	key_left_text.setCharacterSize(70); key_right_text.setCharacterSize(60);
 	key_left_text.setString("A"); key_right_text.setString("D");
 	key_left_text.setPosition(manip_l[3].getPosition().x + 20, manip_l[3].getPosition().y + 5);
@@ -435,7 +438,7 @@ void Options(RenderWindow& window, int player_func_call)
 
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-
+	int pos_x_field_size = 0;
 	int chosen_player = player_func_call;
 
 	std::vector<std::string> list_field_size{"Small", "Normal", "Large"};
@@ -458,6 +461,11 @@ void Options(RenderWindow& window, int player_func_call)
 			else if (player_func_call == 2)
 				{players1.setFillColor(color_players); players2.setFillColor(chosen_color);}
 
+			if (event_opt.type == Event::KeyPressed)
+            {
+				if (event_opt.key.code == Keyboard::Escape) {sleep(milliseconds(300)); MenuStart(window, 0); return;}
+				if (event_opt.type == Event::Closed) window.close();
+			}
 
 			if(IntRect(players1.getPosition().x, players1.getPosition().y, players1.getSize().x, players1.getSize().y).contains(Mouse::getPosition(window)))
 			{OptionsMenuSelected = 0;}
@@ -496,11 +504,8 @@ void Options(RenderWindow& window, int player_func_call)
 					case 5: OptionsMenuSelected=7; break; case 6: OptionsMenuSelected=8; break; case 7: OptionsMenuSelected=9; break;
 					case 8: OptionsMenuSelected=9; break; case 9: OptionsMenuSelected=2; break; case 0: OptionsMenuSelected=2; break;
 					case 1: OptionsMenuSelected=2; break;} }
-				if(event_opt.key.code == Keyboard::Right){++OptionsMenuSelected %=10;}
-				if(event_opt.key.code == Keyboard::Left){--OptionsMenuSelected %=10;}
-
-				if (event_opt.key.code == Keyboard::Escape) {sleep(milliseconds(300)); MenuStart(window, 0); return;}
-				if (event_opt.type == Event::Closed) window.close();
+				if(event_opt.key.code == Keyboard::Right) {++OptionsMenuSelected %=10;}
+				if(event_opt.key.code == Keyboard::Left) {--OptionsMenuSelected %=10;}
             }
 
 			if (OptionsMenuSelected == 0)
@@ -512,7 +517,7 @@ void Options(RenderWindow& window, int player_func_call)
 						Options(window, 1);
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);manip_l[i].setFillColor(color_border);
-				manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color);
+				manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);} save.setFillColor(left_text_color);
 				triangle[0].setFillColor(color_border);
 			}
 			else if (OptionsMenuSelected == 1)
@@ -525,14 +530,14 @@ void Options(RenderWindow& window, int player_func_call)
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color); triangle[0].setFillColor(color_border);
+				save.setFillColor(left_text_color); triangle[0].setFillColor(color_border);
 			}
 			else if(OptionsMenuSelected == 2)
 			{
 				chosen_player = player_func_call;
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(chosen_color);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);
-				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color); 
+				triangle[i].setFillColor(color_border);} save.setFillColor(left_text_color); 
 				if (event_opt.type == Event::TextEntered)
 				{
 					if (event_opt.text.unicode < 128) 
@@ -559,7 +564,7 @@ void Options(RenderWindow& window, int player_func_call)
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color); triangle[0].setFillColor(chosen_color);
+				save.setFillColor(left_text_color); triangle[0].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 4)
 			{
 				chosen_player = player_func_call;
@@ -570,7 +575,7 @@ void Options(RenderWindow& window, int player_func_call)
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color); triangle[1].setFillColor(chosen_color);
+				save.setFillColor(left_text_color); triangle[1].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 5)
 			{
 				chosen_player = player_func_call;
@@ -585,7 +590,7 @@ void Options(RenderWindow& window, int player_func_call)
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(chosen_color); manip_r[i].setFillColor(color_border);
-				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color); 
+				triangle[i].setFillColor(color_border);} save.setFillColor(left_text_color); 
 			} else if (OptionsMenuSelected == 6)
 			{
 				chosen_player = player_func_call;
@@ -600,7 +605,7 @@ void Options(RenderWindow& window, int player_func_call)
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(chosen_color);
-				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color);
+				triangle[i].setFillColor(color_border);} save.setFillColor(left_text_color);
 			} else if (OptionsMenuSelected == 7)
 			{
 				chosen_player = player_func_call;
@@ -611,7 +616,7 @@ void Options(RenderWindow& window, int player_func_call)
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color);triangle[2].setFillColor(chosen_color);
+				save.setFillColor(left_text_color);triangle[2].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 8)
 			{
 				chosen_player = player_func_call;
@@ -622,7 +627,7 @@ void Options(RenderWindow& window, int player_func_call)
 				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color);triangle[3].setFillColor(chosen_color);
+				save.setFillColor(left_text_color);triangle[3].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 9)
 			{
 				chosen_player = player_func_call;
@@ -655,6 +660,8 @@ void Options(RenderWindow& window, int player_func_call)
 			else if (chosen_player == 2 && player_func_call == 1)
 				{players2.setFillColor(chosen_color); players1.setFillColor(color_players);}
 
+			pos_x_field_size = triangle[2].getLocalBounds().left+(triangle[3].getLocalBounds().left-triangle[2].getLocalBounds().left)/2-field_size.getLocalBounds().width/2+triangle_width*0.5;
+			field_size.setPosition(pos_x_field_size, triangle[2].getLocalBounds().top - 5);
         }
         window.clear();
 		window.draw(options_back);
