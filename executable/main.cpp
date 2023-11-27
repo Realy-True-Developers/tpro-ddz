@@ -131,7 +131,7 @@ int main(){
      
         Doodle.setPosition(DoodleX, DoodleY);
 
-        if (!isUp){ // дудл падает
+        if (!isUp&&!WindowUp){ // дудл падает
             for (size_t i = 0; i < 5; ++i){
                 if ((_platforms[i]._coordY-PlatSizeY/2<=DoodleY+DoodleSizeY/2)&& //Нижний край дудла ниже верхнего края платформы
                 (DoodleY+DoodleSizeY/2<=_platforms[i]._coordY+PlatSizeY/2)&& //Нижний край дудла выше нижнего края платформы

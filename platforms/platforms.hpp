@@ -1,7 +1,10 @@
 #include <random>
+#include <ctime>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <algorithm>
+using namespace std;
+
 using namespace std;
 
 enum PlatType{
