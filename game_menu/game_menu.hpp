@@ -72,4 +72,4 @@ void GameStart(RenderWindow& window);
 void Options(RenderWindow& window, int player_func_call = 1); 	
 void About_Game();
 void Exit(RenderWindow& Window);
-void Play(RenderWindow& window);
+void Play(RenderWindow& window); 
