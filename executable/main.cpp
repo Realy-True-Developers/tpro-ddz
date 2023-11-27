@@ -1,12 +1,38 @@
 #include "../game_menu/game_menu.hpp"
 #include "../platforms/platforms.cpp"
+using namespace sf;
 
 int main(){
-    sf::ContextSettings settings;
+    random_device rd;   // non-deterministic generator
+    mt19937 gen(rd());
+
+
+
+    Image doodleimageright; //создал объект Image
+    doodleimageright.loadFromFile("../../images/blue-lik-right.png");
+    Image doodleimageleft; //создал объект Image
+    doodleimageleft.loadFromFile("../../images/blue-lik-left.png");
+
+    Texture doodletextureright; //создал объект Texture
+    doodletextureright.loadFromImage(doodleimageright); //передал в него объект Image
+    Texture doodletextureleft; //создал объект Texture
+    doodletextureleft.loadFromImage(doodleimageleft); //передал в него объект Image
+
+    Sprite doodlespriteright; // создал объект Sprite
+    doodlespriteright.setTexture(doodletextureright); //передал в него объект Texture
+    Sprite doodlespriteleft; // создал объект Sprite
+    doodlespriteleft.setTexture(doodletextureleft); //передал в него объект Texture
+
+
+
+
+
+    ContextSettings settings;
     settings.antialiasingLevel = 8;
     
+    bool lr = true;
     bool gamepause=true; //Флаг паузы
-
+    bool WindowUp=false; //Подъём экрана поосле отскока от платформы
     // Объект, который, собственно, является главным окном приложения
     sf::RenderWindow window(sf::VideoMode(900, 1000), "Game", sf::Style::Default, settings);
 
@@ -17,22 +43,16 @@ int main(){
     pause.setFillColor(sf::Color(122,122,122,200));
     pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
-    platforms plat1(standart, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-    platforms plat2(moving, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-    platforms plat3(broken, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-    platforms plat4(disappearing, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-    platforms plat5(standart, rand()%(WinSizeX-75), 200+rand()%(WinSizeY-15));
-
-    //sf::RectangleShape plat1(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat2(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat3(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat4(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat5(sf::Vector2f(150.f, 30.f));
+    platforms plat1(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), WinSizeY/5-15);
+    platforms plat2(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 2*WinSizeY/5-15);
+    platforms plat3(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 3*WinSizeY/5-15);
+    platforms plat4(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 4*WinSizeY/5-15);
+    platforms plat5(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), WinSizeY-15);
 
     platforms platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
     
-    sf::RectangleShape Doodle(sf::Vector2f(120.f, 150.f));
+    sf::RectangleShape Doodle(sf::Vector2f(20., 30.));
     Doodle.setFillColor(sf::Color::Green);
     Doodle.setOrigin(sf::Vector2f(Doodle.getSize().x / 2, Doodle.getSize().y / 2)); //Создаём попрыгунчика, ставим центр его координат в центр прямоугольника
 
@@ -41,10 +61,20 @@ int main(){
     Doodle.setPosition(sf::Vector2f(static_cast<float>(DoodleX),
                                    static_cast<float>(DoodleY)));
 
+    
+    doodlespriteright.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-34.f))); // задал Sprite начальную позицию далее он двигается вместе с первоначальным прямоугольником
+    doodlespriteleft.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-34.f))); // задал Sprite начальную позицию далее он двигается вместе с первоначальным прямоугольником
+
+
     bool isUp=true; //флаг, показывает поднимается дудл или нет
     
+    float prevplatformheught;
+
     while (window.isOpen()){
         sf::Event event;
+
         while (window.pollEvent(event)){
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -57,6 +87,8 @@ int main(){
                         platforms[i].Draw(window);
                     }
                     window.draw(Doodle);
+                    window.draw(doodlespriteright); //отрисовка Sprite
+                    window.draw(doodlespriteleft);
                     window.draw(pause);
                     window.display();
                 while (gamepause)
@@ -71,25 +103,61 @@ int main(){
                 }
             }
         }
+        
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
                 DoodleX-=0.07f;
+                doodlespriteleft.move(-0.07f, 0);
+                doodlespriteleft.setTextureRect(IntRect(0,0,62,60));
+                doodlespriteright.setTextureRect(IntRect(300,200,200,200));
+                lr = false;
                 }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
                 DoodleX+=0.07f;
+                doodlespriteright.move(0.07f, 0);
+                doodlespriteright.setTextureRect(IntRect(0,0,62,60));
+                doodlespriteleft.setTextureRect(IntRect(300,200,200,200));
+                lr = true;
             }
-            
-        if(isUp)
-            DoodleY-=0.1f;
-        else
-            DoodleY+=0.1f;
+
+        if (!WindowUp){
+            if(isUp) {
+                DoodleY-=0.1f;
+                doodlespriteright.move(0, -0.1f);
+                doodlespriteleft.move(0, -0.1f); }
+            else if(!isUp) {
+                DoodleY+=0.1f;
+                doodlespriteright.move(0, 0.1f);
+                doodlespriteleft.move(0, 0.1f); }
+        }
+        else{
+            if (isUp) {
+                DoodleY-=0.05f;
+                doodlespriteright.move(0, -0.05f);
+                doodlespriteleft.move(0, -0.05f); }
+            else {
+                DoodleY+=0.05f;
+                doodlespriteright.move(0, 0.05f);
+                doodlespriteleft.move(0, 0.05f); }
+            for (size_t i = 0; i < 5; ++i){
+                platforms[i]._coordY+=0.1;
+            }
+            prevplatformheught+=0.1;
+            if(prevplatformheught>WinSizeY-75){
+                WindowUp=false;
+            }
+        }
+
+        if(DoodleY<=WinSizeY/3-75)
+                isUp=false;
 
         if (DoodleX<=-Doodle.getSize().x/2)
             DoodleX=WinSizeX+Doodle.getSize().x/2-1;
         if(DoodleX>=WinSizeX+Doodle.getSize().x/2)
             DoodleX=-Doodle.getSize().x/2+1;
-
-        if(DoodleY<=Doodle.getSize().y/2)
-                isUp=false;
+        doodlespriteright.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-34.f)));
+        doodlespriteleft.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-34.f)));
         
         if(DoodleY>=WinSizeY+Doodle.getSize().y/2){
             goto gameover;
@@ -97,14 +165,16 @@ int main(){
      
         Doodle.setPosition(DoodleX, DoodleY);
 
-        if (!isUp){ // дудл падает
+        if (!isUp&&!WindowUp){ // дудл падает
             for (size_t i = 0; i < 5; ++i){
-                if ((platforms[i]._coordY-15<=DoodleY+75)&& //Нижний край дудла ниже верхнего края платформы
-                (DoodleY+75<=platforms[i]._coordY+15)&& //Нижний край дудла выше нижнего края платформы
-                (platforms[i]._coordX-75<DoodleX+60)&& 
-                (DoodleX-60<platforms[i]._coordX+75)&& //Дудл попадает на платформу хотя бы краем своего тела
+                if ((platforms[i]._coordY-platforms[i].shape.getSize().y/2<=DoodleY+Doodle.getSize().y/2)&& //Нижний край дудла ниже верхнего края платформы
+                (DoodleY+Doodle.getSize().y/2<=platforms[i]._coordY+platforms[i].shape.getSize().y/2)&& //Нижний край дудла выше нижнего края платформы
+                (platforms[i]._coordX-platforms[i].shape.getSize().x/2<DoodleX+Doodle.getSize().x/2)&& 
+                (DoodleX-Doodle.getSize().x/2<platforms[i]._coordX+platforms[i].shape.getSize().x/2)&& //Дудл попадает на платформу хотя бы краем своего тела
                 platforms[i]._type!=broken){ //Платформа не сломанная
                     isUp=true;
+                    WindowUp=true;
+                    prevplatformheught=platforms[i]._coordY;
                     if (platforms[i]._type==disappearing){
                         platforms[i].IsJumped=true;
                     }
@@ -122,6 +192,10 @@ int main(){
         }
 
         window.draw(Doodle);
+        if (lr)
+            window.draw(doodlespriteright); //отрисовка Sprite
+        else if(!lr)
+            window.draw(doodlespriteleft); //отрисовка Sprite
         window.display();
     }
 
