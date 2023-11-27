@@ -63,16 +63,12 @@ void platforms::Draw(sf::RenderWindow& window){
         }
         case 3:{
             if (IsJumped){
-                platforms newplat(static_cast<PlatType>(gen()%3),gen()%(window.getSize().x-75), -15);
+                platforms newplat(static_cast<PlatType>(gen()%4),gen()%(window.getSize().x-75), -(window.getSize().y-_coordY));
                 *this=newplat;
             }
             break;
         }
     }
     this->shape.setPosition(_coordX, _coordY);
-    if (_coordY>window.getSize().y+15){
-        platforms newplat2(static_cast<PlatType>(gen()%3),gen()%(window.getSize().x-75), -15);
-        *this=newplat2;
-    }
     window.draw(this->shape);
 }

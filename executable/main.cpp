@@ -1,6 +1,17 @@
 #include "../game_menu/game_menu.hpp"
 #include "../platforms/platforms.cpp"
 
+
+void BubbleSort(platforms array[], size_t size) {
+  for (size_t idx_i = 0; idx_i + 1 < size; ++idx_i) {
+    for (size_t idx_j = 0; idx_j + 1 < size - idx_i; ++idx_j) {
+      if (array[idx_j + 1]._coordY < array[idx_j]._coordY) {
+        swap(array[idx_j], array[idx_j + 1]);
+      }
+    }
+  }
+}
+
 int main(){
     random_device rd;   // non-deterministic generator
     mt19937 gen(rd());
@@ -20,33 +31,33 @@ int main(){
     pause.setFillColor(sf::Color(122,122,122,200));
     pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
-    platforms plat1(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), WinSizeY/5-15);
-    platforms plat2(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 2*WinSizeY/5-15);
-    platforms plat3(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 3*WinSizeY/5-15);
-    platforms plat4(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), 4*WinSizeY/5-15);
-    platforms plat5(static_cast<PlatType>(gen()%4), gen()%(WinSizeX-75), WinSizeY-15);
+    platforms plat1(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), WinSizeY/5-15);
+    platforms plat2(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 2*WinSizeY/5-15);
+    platforms plat3(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 3*WinSizeY/5-15);
+    platforms plat4(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 4*WinSizeY/5-15);
+    platforms plat5(static_cast<PlatType>(0), WinSizeX/2, WinSizeY-15);
 
-    //sf::RectangleShape plat1(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat2(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat3(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat4(sf::Vector2f(150.f, 30.f));
-    //sf::RectangleShape plat5(sf::Vector2f(150.f, 30.f));
-
-    platforms platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
+    platforms _platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
     
-    sf::RectangleShape Doodle(sf::Vector2f(120., 150.));
+    sf::RectangleShape Doodle(sf::Vector2f(20.f, 50.f));
     Doodle.setFillColor(sf::Color::Green);
     Doodle.setOrigin(sf::Vector2f(Doodle.getSize().x / 2, Doodle.getSize().y / 2)); //Создаём попрыгунчика, ставим центр его координат в центр прямоугольника
 
     float DoodleX=WinSizeX / 2;
     float DoodleY=WinSizeY - 100.0f;
+
     Doodle.setPosition(sf::Vector2f(static_cast<float>(DoodleX),
                                    static_cast<float>(DoodleY)));
 
+    float DoodleSizeX = Doodle.getSize().x;
+    float DoodleSizeY = Doodle.getSize().y;
+
+    float PlatSizeX = plat1.shape.getSize().x;
+    float PlatSizeY = plat1.shape.getSize().y;
+
     bool isUp=true; //флаг, показывает поднимается дудл или нет
     
-    int prevplatform;
     float prevplatformheught;
 
     while (window.isOpen()){
@@ -60,7 +71,7 @@ int main(){
                 sf::Event pauseEvent;
                 gamepause=true;
                 for (size_t i = 0; i < 5; ++i){
-                        platforms[i].Draw(window);
+                        _platforms[i].Draw(window);
                     }
                     window.draw(Doodle);
                     window.draw(pause);
@@ -77,87 +88,100 @@ int main(){
                 }
             }
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
-                DoodleX-=0.07f;
-                }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
-                DoodleX+=0.07f;
-            }
 
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
+            if (DoodleX>=DoodleSizeX/2)
+                DoodleX-=0.07f;
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
+            if (DoodleX<=WinSizeX-DoodleSizeX/2)
+                DoodleX+=0.07f;
+        }
+        
         if (!WindowUp){
             if(isUp)
                 DoodleY-=0.1f;
             else if(!isUp)
                 DoodleY+=0.1f;
+            if(DoodleY<=WinSizeY/3-DoodleSizeY/2)
+                isUp=false;
         }
         else{
-            if (isUp)
+            if (isUp){
                 DoodleY-=0.05f;
-            else
-                DoodleY+=0.05f;
-            
-            for (size_t i = 0; i < 5; ++i){
-                platforms[i]._coordY+=0.1;
             }
-            prevplatformheught+=0.1;
-            if(/*platforms[prevplatform]._coordY>WinSizeY-75*/prevplatformheught>WinSizeY-75){
+            else{
+                DoodleY+=0.05f;
+            }
+            for (size_t i = 0; i < 5; ++i){
+                _platforms[i]._coordY+=0.2f;
+            }
+            prevplatformheught+=0.2f;
+            if(prevplatformheught>WinSizeY-DoodleSizeY/2){
                 WindowUp=false;
             }
-        }
-
-        if(DoodleY<=WinSizeY/3-75)
+            if(DoodleY<=WinSizeY/3)
                 isUp=false;
-
-        if (DoodleX<=-Doodle.getSize().x/2)
-            DoodleX=WinSizeX+Doodle.getSize().x/2-1;
-        if(DoodleX>=WinSizeX+Doodle.getSize().x/2)
-            DoodleX=-Doodle.getSize().x/2+1;
-
-        
-        
-        if(DoodleY>=WinSizeY+Doodle.getSize().y/2){
-            goto gameover;
+        }
+      
+        if(DoodleY>=WinSizeY+DoodleSizeY/2){
+            window.clear(sf::Color(255, 255, 255));
+            return 0;
         }
      
         Doodle.setPosition(DoodleX, DoodleY);
 
-        if (!isUp&&!WindowUp){ // дудл падает
+        if (!isUp){ // дудл падает
             for (size_t i = 0; i < 5; ++i){
-                if ((platforms[i]._coordY-15<=DoodleY+75)&& //Нижний край дудла ниже верхнего края платформы
-                (DoodleY+75<=platforms[i]._coordY+15)&& //Нижний край дудла выше нижнего края платформы
-                (platforms[i]._coordX-75<DoodleX+60)&& 
-                (DoodleX-60<platforms[i]._coordX+75)&& //Дудл попадает на платформу хотя бы краем своего тела
-                platforms[i]._type!=broken){ //Платформа не сломанная
+                if ((_platforms[i]._coordY-PlatSizeY/2<=DoodleY+DoodleSizeY/2)&& //Нижний край дудла ниже верхнего края платформы
+                (DoodleY+DoodleSizeY/2<=_platforms[i]._coordY+PlatSizeY/2)&& //Нижний край дудла выше нижнего края платформы
+                (_platforms[i]._coordX-PlatSizeX/2<DoodleX+DoodleSizeX/2)&& 
+                (DoodleX-DoodleSizeX/2<_platforms[i]._coordX+PlatSizeX/2)&& //Дудл попадает на платформу хотя бы краем своего тела
+                _platforms[i]._type!=broken){ //Платформа не сломанная
                     isUp=true;
                     WindowUp=true;
-                    prevplatformheught=platforms[i]._coordY;
-                    //prevplatform=i;
-                    if (platforms[i]._type==disappearing){
-                        platforms[i].IsJumped=true;
+                    prevplatformheught=_platforms[i]._coordY;
+                    if (_platforms[i]._type==disappearing){
+                        _platforms[i].IsJumped=true;
                     }
                     break;
                 }
             }
         }
-
-        
+        if (isUp){ // дудл поднимается
+            for (size_t i = 0; i < 5; ++i){
+                if ((_platforms[i]._coordY-PlatSizeY/2<=DoodleY-DoodleSizeY/2)&& //Верхний край дудла ниже верхнего края платформы
+                (DoodleY-DoodleSizeY/2<=_platforms[i]._coordY+PlatSizeY/2)&& //Верхний край дудла выше нижнего края платформы
+                (_platforms[i]._coordX-PlatSizeX/2<DoodleX+DoodleSizeX/2)&& 
+                (DoodleX-DoodleSizeX/2<_platforms[i]._coordX+PlatSizeX/2)&& //Дудл попадает на платформу хотя бы краем своего тела
+                _platforms[i]._type!=broken){ //Платформа не сломанная
+                    isUp=false;
+                    WindowUp=false;
+                    break;
+                }
+            }
+        }
 
         window.clear(sf::Color(255, 255, 255));
 
         for (size_t i = 0; i < 5; ++i){
-            platforms[i].Draw(window);
+            if (_platforms[i]._coordY>WinSizeY+PlatSizeY/2){
+                int type=gen()%4;
+                if (type==_platforms[0]._type){
+                    type+=1;
+                    type%=4;
+                }
+                platforms newplat(static_cast<PlatType>(type),DoodleSizeY/2+gen()%(int)(window.getSize().x-DoodleSizeY/2), -PlatSizeY/2);
+                _platforms[i]=newplat;
+            }
+            _platforms[i].Draw(window);
         }
+
+        BubbleSort(_platforms, 5);
 
         window.draw(Doodle);
         window.display();
     }
 
-
-    gameover:{
-        window.clear(sf::Color(255, 255, 255));
-        return 0;
-    }
-
-    
     return 0;
 }
