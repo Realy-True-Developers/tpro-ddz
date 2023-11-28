@@ -5,7 +5,6 @@
 #include <algorithm>
 using namespace std;
 
-using namespace std;
 
 enum PlatType{
     standart, //Обычные платформы
