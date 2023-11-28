@@ -51,7 +51,7 @@ namespace game
 		void AlignMenu(int posx);   											
 		void MouseChosen(int chosen_point); 									
 		int getSelectedMenuNumber() {return mainMenuSelected;} 
-	};		
+	};
 }
 
 // int CountLinesInFile(std::string filename);
@@ -72,4 +72,5 @@ void GameStart(RenderWindow& window);
 void Options(RenderWindow& window, int player_func_call = 1); 	
 void About_Game();
 void Exit(RenderWindow& Window);
-void Play(RenderWindow& window); 
+void Play(RenderWindow& window);
+void Pause(RenderWindow& window);
