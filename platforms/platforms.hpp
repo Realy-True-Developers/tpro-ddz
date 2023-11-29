@@ -5,8 +5,6 @@
 #include <algorithm>
 using namespace std;
 
-using namespace std;
-
 enum PlatType{
     standart, //Обычные платформы
     broken, //Сломанные платформы(при падении на них дудл не отскакивает, а продолжает падать)

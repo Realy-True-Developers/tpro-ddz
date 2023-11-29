@@ -1,6 +1,6 @@
 #include "../game_menu/game_menu.hpp"
 #include "../platforms/platforms.cpp"
-
+using namespace sf;
 
 void BubbleSort(platforms array[], size_t size) {
   for (size_t idx_i = 0; idx_i + 1 < size; ++idx_i) {
@@ -16,9 +16,26 @@ int main(){
     random_device rd;   // non-deterministic generator
     mt19937 gen(rd());
 
-    sf::ContextSettings settings;
+    Image doodleimageright; //создал объект Image
+    doodleimageright.loadFromFile("../../images/blue-lik-right.png");
+    Image doodleimageleft; //создал объект Image
+    doodleimageleft.loadFromFile("../../images/blue-lik-left.png");
+
+    Texture doodletextureright; //создал объект Texture
+    doodletextureright.loadFromImage(doodleimageright); //передал в него объект Image
+    Texture doodletextureleft; //создал объект Texture
+    doodletextureleft.loadFromImage(doodleimageleft); //передал в него объект Image
+
+    Sprite doodlespriteright; // создал объект Sprite
+    doodlespriteright.setTexture(doodletextureright); //передал в него объект Texture
+    Sprite doodlespriteleft; // создал объект Sprite
+    doodlespriteleft.setTexture(doodletextureleft); //передал в него объект Texture
+
+    ContextSettings settings;
+
     settings.antialiasingLevel = 8;
     
+    bool lr = true;
     bool gamepause=true; //Флаг паузы
     bool WindowUp=false; //Подъём экрана поосле отскока от платформы
     // Объект, который, собственно, является главным окном приложения
@@ -31,16 +48,17 @@ int main(){
     pause.setFillColor(sf::Color(122,122,122,200));
     pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
-    platforms plat1(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), WinSizeY/5-15);
-    platforms plat2(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 2*WinSizeY/5-15);
-    platforms plat3(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 3*WinSizeY/5-15);
-    platforms plat4(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 4*WinSizeY/5-15);
-    platforms plat5(static_cast<PlatType>(0), WinSizeX/2, WinSizeY-15);
+    _platforms plat1(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), WinSizeY/5-15);
+    _platforms plat2(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 2*WinSizeY/5-15);
+    _platforms plat3(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 3*WinSizeY/5-15);
+    _platforms plat4(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 4*WinSizeY/5-15);
+    _platforms plat5(static_cast<PlatType>(0), WinSizeX/2, WinSizeY-15);
 
     platforms _platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
     
     sf::RectangleShape Doodle(sf::Vector2f(20.f, 50.f));
+
     Doodle.setFillColor(sf::Color::Green);
     Doodle.setOrigin(sf::Vector2f(Doodle.getSize().x / 2, Doodle.getSize().y / 2)); //Создаём попрыгунчика, ставим центр его координат в центр прямоугольника
 
@@ -49,6 +67,11 @@ int main(){
 
     Doodle.setPosition(sf::Vector2f(static_cast<float>(DoodleX),
                                    static_cast<float>(DoodleY)));
+    
+    doodlespriteright.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-34.f))); // задал Sprite начальную позицию далее он двигается вместе с первоначальным прямоугольником
+    doodlespriteleft.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-34.f))); // задал Sprite начальную позицию далее он двигается вместе с первоначальным прямоугольником
 
     float DoodleSizeX = Doodle.getSize().x;
     float DoodleSizeY = Doodle.getSize().y;
@@ -62,6 +85,7 @@ int main(){
 
     while (window.isOpen()){
         sf::Event event;
+
         while (window.pollEvent(event)){
             if (event.type == sf::Event::Closed)
                 window.close();
@@ -74,6 +98,8 @@ int main(){
                         _platforms[i].Draw(window);
                     }
                     window.draw(Doodle);
+                    window.draw(doodlespriteright); //отрисовка Sprite
+                    window.draw(doodlespriteleft);
                     window.draw(pause);
                     window.display();
                 while (gamepause)
@@ -88,10 +114,10 @@ int main(){
                 }
             }
         }
-
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
             if (DoodleX>=DoodleSizeX/2)
                 DoodleX-=0.07f;
+
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
             if (DoodleX<=WinSizeX-DoodleSizeX/2)
@@ -178,10 +204,18 @@ int main(){
         }
 
         BubbleSort(_platforms, 5);
-
+      
+       doodlespriteleft.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-34.f)));
+      
         window.draw(Doodle);
+        if (lr)
+            window.draw(doodlespriteright); //отрисовка Sprite
+        else if(!lr)
+            window.draw(doodlespriteleft); //отрисовка Sprite
+     
         window.display();
     }
-
+    
     return 0;
 }
