@@ -48,18 +48,27 @@ int main(){
     pause.setFillColor(sf::Color(122,122,122,200));
     pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
-    _platforms plat1(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), WinSizeY/5-15);
-    _platforms plat2(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 2*WinSizeY/5-15);
-    _platforms plat3(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 3*WinSizeY/5-15);
-    _platforms plat4(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 4*WinSizeY/5-15);
-    _platforms plat5(static_cast<PlatType>(0), WinSizeX/2, WinSizeY-15);
+
+
+    platforms plat1(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-150), WinSizeY/5-15);
+    platforms plat2(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-150), 2*WinSizeY/5-15);
+    platforms plat3(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-150), 3*WinSizeY/5-15);
+    platforms plat4(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-150), 4*WinSizeY/5-15);
+    platforms plat5(static_cast<PlatType>(0), WinSizeX/2, WinSizeY-15);
 
     platforms _platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
+    for (size_t i = 0; i < 4; ++i)
+    {
+        if(_platforms[i]._type==_platforms[i+1]._type){
+            platforms newplat(static_cast<PlatType>((_platforms[i]._type+1)%4),75+gen()%(int)(WinSizeX-150), _platforms[i]._coordY);
+            _platforms[i]=newplat;
+        }
+    }
     
-    sf::RectangleShape Doodle(sf::Vector2f(20.f, 50.f));
+    sf::RectangleShape Doodle(sf::Vector2f(30.f, 45.f));
 
-    Doodle.setFillColor(sf::Color::Green);
+    Doodle.setFillColor(sf::Color(0,255,0,0));
     Doodle.setOrigin(sf::Vector2f(Doodle.getSize().x / 2, Doodle.getSize().y / 2)); //Создаём попрыгунчика, ставим центр его координат в центр прямоугольника
 
     float DoodleX=WinSizeX / 2;
@@ -98,8 +107,10 @@ int main(){
                         _platforms[i].Draw(window);
                     }
                     window.draw(Doodle);
-                    window.draw(doodlespriteright); //отрисовка Sprite
-                    window.draw(doodlespriteleft);
+                    if(lr)
+                        window.draw(doodlespriteright); //отрисовка Sprite
+                    else
+                        window.draw(doodlespriteleft);
                     window.draw(pause);
                     window.display();
                 while (gamepause)
@@ -118,10 +129,13 @@ int main(){
             if (DoodleX>=DoodleSizeX/2)
                 DoodleX-=0.07f;
 
+            lr=false;
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
             if (DoodleX<=WinSizeX-DoodleSizeX/2)
                 DoodleX+=0.07f;
+
+            lr=true;
         }
         
         if (!WindowUp){
@@ -197,7 +211,7 @@ int main(){
                     type+=1;
                     type%=4;
                 }
-                platforms newplat(static_cast<PlatType>(type),DoodleSizeY/2+gen()%(int)(window.getSize().x-DoodleSizeY/2), -PlatSizeY/2);
+                platforms newplat(static_cast<PlatType>(type),PlatSizeX/2+gen()%(int)(window.getSize().x-PlatSizeX), -PlatSizeY/2);
                 _platforms[i]=newplat;
             }
             _platforms[i].Draw(window);
@@ -205,13 +219,14 @@ int main(){
 
         BubbleSort(_platforms, 5);
       
-       doodlespriteleft.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
-                                   static_cast<float>(DoodleY-34.f)));
-      
+        doodlespriteleft.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-38.f)));
+        doodlespriteright.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-38.f)));
         window.draw(Doodle);
         if (lr)
             window.draw(doodlespriteright); //отрисовка Sprite
-        else if(!lr)
+        else
             window.draw(doodlespriteleft); //отрисовка Sprite
      
         window.display();
