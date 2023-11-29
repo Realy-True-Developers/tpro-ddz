@@ -1,6 +1,6 @@
 #include "../game_menu/game_menu.hpp"
 #include "../platforms/platforms.cpp"
-
+using namespace sf;
 
 void BubbleSort(platforms array[], size_t size) {
   for (size_t idx_i = 0; idx_i + 1 < size; ++idx_i) {
@@ -16,38 +16,65 @@ int main(){
     random_device rd;   // non-deterministic generator
     mt19937 gen(rd());
 
+    Image doodleimageright; //создал объект Image
+    doodleimageright.loadFromFile("../../images/blue-lik-right.png");
+    Image doodleimageleft; //создал объект Image
+    doodleimageleft.loadFromFile("../../images/blue-lik-left.png");
+
+    Texture doodletextureright; //создал объект Texture
+    doodletextureright.loadFromImage(doodleimageright); //передал в него объект Image
+    Texture doodletextureleft; //создал объект Texture
+    doodletextureleft.loadFromImage(doodleimageleft); //передал в него объект Image
+
+    Sprite doodlespriteright; // создал объект Sprite
+    doodlespriteright.setTexture(doodletextureright); //передал в него объект Texture
+    Sprite doodlespriteleft; // создал объект Sprite
+    doodlespriteleft.setTexture(doodletextureleft); //передал в него объект Texture
+
     ContextSettings settings;
+
     settings.antialiasingLevel = 8;
     
+    bool lr = true;
     bool gamepause=true; //Флаг паузы
     bool WindowUp=false; //Подъём экрана поосле отскока от платформы
     // Объект, который, собственно, является главным окном приложения
-    RenderWindow window(VideoMode(900, 1000), "Game", Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(900, 1000), "Game", sf::Style::Default, settings);
 
     int WinSizeX = window.getSize().x;
     int WinSizeY = window.getSize().y; //Переменные размера окна, чтобы не вызвать постоянно функции
 
-    RectangleShape pause(Vector2f(WinSizeX, WinSizeY));
-    pause.setFillColor(Color(122,122,122,200));
-    pause.setPosition(Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
+    sf::RectangleShape pause(sf::Vector2f(WinSizeX, WinSizeY));
+    pause.setFillColor(sf::Color(122,122,122,200));
+    pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
-    platforms plat1(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), WinSizeY/5-15);
-    platforms plat2(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 2*WinSizeY/5-15);
-    platforms plat3(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 3*WinSizeY/5-15);
-    platforms plat4(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-75), 4*WinSizeY/5-15);
+
+
+    platforms plat1(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-150), WinSizeY/5-15);
+    platforms plat2(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-150), 2*WinSizeY/5-15);
+    platforms plat3(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-150), 3*WinSizeY/5-15);
+    platforms plat4(static_cast<PlatType>(gen()%4), 75+gen()%(WinSizeX-150), 4*WinSizeY/5-15);
     platforms plat5(static_cast<PlatType>(0), WinSizeX/2, WinSizeY-15);
 
     platforms _platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
+    for (size_t i = 0; i < 4; ++i)
+    {
+        if(_platforms[i]._type==_platforms[i+1]._type){
+            platforms newplat(static_cast<PlatType>((_platforms[i]._type+1)%4),75+gen()%(int)(WinSizeX-150), _platforms[i]._coordY);
+            _platforms[i]=newplat;
+        }
+    }
     
-    RectangleShape Doodle(Vector2f(20.f, 50.f));
-    Doodle.setFillColor(Color::Green);
-    Doodle.setOrigin(Vector2f(Doodle.getSize().x / 2, Doodle.getSize().y / 2)); //Создаём попрыгунчика, ставим центр его координат в центр прямоугольника
+    sf::RectangleShape Doodle(sf::Vector2f(30.f, 45.f));
+
+    Doodle.setFillColor(sf::Color(0,255,0,0));
+    Doodle.setOrigin(sf::Vector2f(Doodle.getSize().x / 2, Doodle.getSize().y / 2)); //Создаём попрыгунчика, ставим центр его координат в центр прямоугольника
 
     float DoodleX=WinSizeX / 2;
     float DoodleY=WinSizeY - 100.0f;
 
-    Doodle.setPosition(Vector2f(static_cast<float>(DoodleX),
+    Doodle.setPosition(sf::Vector2f(static_cast<float>(DoodleX),
                                    static_cast<float>(DoodleY)));
 
     float DoodleSizeX = Doodle.getSize().x;
@@ -61,43 +88,49 @@ int main(){
     float prevplatformheught;
 
     while (window.isOpen()){
-        Event event;
+        sf::Event event;
+
         while (window.pollEvent(event)){
-            if (event.type == Event::Closed)
+            if (event.type == sf::Event::Closed)
                 window.close();
 
-            if (event.type == Event::KeyReleased && event.key.code==Keyboard::Escape)
+            if (event.type == sf::Event::KeyReleased && event.key.code==sf::Keyboard::Escape)
             {
-                Event pauseEvent;
+                sf::Event pauseEvent;
                 gamepause=true;
-                // Pause(window);
                 for (size_t i = 0; i < 5; ++i){
                         _platforms[i].Draw(window);
                     }
-                window.draw(Doodle);
-                window.draw(pause);
-                window.display();
-                    
+                    window.draw(Doodle);
+                    if(lr)
+                        window.draw(doodlespriteright); //отрисовка Sprite
+                    else
+                        window.draw(doodlespriteleft);
+                    window.draw(pause);
+                    window.display();
                 while (gamepause)
                 {
                     while (window.pollEvent(pauseEvent)){
-                        if (pauseEvent.type == Event::Closed)
+                        if (pauseEvent.type == sf::Event::Closed)
                             window.close();               
-                        if(pauseEvent.type == Event::KeyReleased && pauseEvent.key.code==Keyboard::Escape){
+                        if(pauseEvent.type == sf::Event::KeyReleased && pauseEvent.key.code==sf::Keyboard::Escape){
                             gamepause=false;
                         }
                     }
                 }
             }
         }
-
-        if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)){
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
             if (DoodleX>=DoodleSizeX/2)
                 DoodleX-=0.07f;
+
+            lr=false;
         }
-        if (Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)){
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
             if (DoodleX<=WinSizeX-DoodleSizeX/2)
                 DoodleX+=0.07f;
+
+            lr=true;
         }
         
         if (!WindowUp){
@@ -127,7 +160,7 @@ int main(){
         }
       
         if(DoodleY>=WinSizeY+DoodleSizeY/2){
-            window.clear(Color(255, 255, 255));
+            window.clear(sf::Color(255, 255, 255));
             return 0;
         }
      
@@ -164,7 +197,7 @@ int main(){
             }
         }
 
-        window.clear(Color(255, 255, 255));
+        window.clear(sf::Color(255, 255, 255));
 
         for (size_t i = 0; i < 5; ++i){
             if (_platforms[i]._coordY>WinSizeY+PlatSizeY/2){
@@ -173,17 +206,26 @@ int main(){
                     type+=1;
                     type%=4;
                 }
-                platforms newplat(static_cast<PlatType>(type),DoodleSizeY/2+gen()%(int)(window.getSize().x-DoodleSizeY/2), -PlatSizeY/2);
+                platforms newplat(static_cast<PlatType>(type),PlatSizeX/2+gen()%(int)(window.getSize().x-PlatSizeX), -PlatSizeY/2);
                 _platforms[i]=newplat;
             }
             _platforms[i].Draw(window);
         }
 
         BubbleSort(_platforms, 5);
-
+      
+        doodlespriteleft.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-38.f)));
+        doodlespriteright.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
+                                   static_cast<float>(DoodleY-38.f)));
         window.draw(Doodle);
+        if (lr)
+            window.draw(doodlespriteright); //отрисовка Sprite
+        else
+            window.draw(doodlespriteleft); //отрисовка Sprite
+     
         window.display();
     }
-
+    
     return 0;
 }

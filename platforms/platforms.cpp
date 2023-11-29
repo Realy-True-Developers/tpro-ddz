@@ -63,7 +63,7 @@ void platforms::Draw(sf::RenderWindow& window){
         }
         case 3:{
             if (IsJumped){
-                platforms newplat(static_cast<PlatType>(gen()%4),gen()%(window.getSize().x-75), -(window.getSize().y-_coordY));
+                platforms newplat(static_cast<PlatType>(gen()%4),75+gen()%(window.getSize().x-150), -(window.getSize().y-_coordY));
                 *this=newplat;
             }
             break;
