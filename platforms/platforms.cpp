@@ -40,7 +40,8 @@ void platforms::SetCoords(float x, float y){
 }
 
 void platforms::Draw(sf::RenderWindow& window){
-    this->shape.setPosition(_coordX, _coordY);
+    random_device rd;   // non-deterministic generator
+    mt19937 gen(rd());
     switch (_type)
     {
         case 0:
@@ -62,11 +63,12 @@ void platforms::Draw(sf::RenderWindow& window){
         }
         case 3:{
             if (IsJumped){
-                platforms newplat(static_cast<PlatType>(rand()%3),rand()%(window.getSize().x-75), 200+rand()%(window.getSize().y-75));
+                platforms newplat(static_cast<PlatType>(gen()%4),gen()%(window.getSize().x-75), -(window.getSize().y-_coordY));
                 *this=newplat;
             }
             break;
         }
     }
+    this->shape.setPosition(_coordX, _coordY);
     window.draw(this->shape);
 }

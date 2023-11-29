@@ -1,15 +1,178 @@
+/*!
+\file
+\brief Файл с реализацией функций отрисовки всех окон различных меню
+
+Данный файл содержит в себе реализацию методов,
+ используемых в программе для отрисовки окон меню, таких как
+ главное меню, меню настроек, диалогового окна при выходе из игры,
+ меню настроек игрового процесса
+*/
+
+
 #include "game_menu.hpp"
 
-
-void GameStart(RenderWindow& window) // Функция запуска игры
+/*!
+* \brief Отрисовка главного меню игры.
+* Функция рисует главное меню, позволяет переходить к другим пунктам как мышью, так и клавиатурой
+* \param[in] window Окно, которое выводится на экран. Передаётся по адресу
+* \param[in] start_menu_point Изначально выбранный пункт меню
+*/
+void MenuStart(RenderWindow& window, int start_menu_point)
 {
+	sleep(milliseconds(200));
+    RectangleShape background(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
+    Texture texture_window;
+    
+    if (!texture_window.loadFromFile("../../images/mainBackground.jpg")) exit(2); // Установка фона главного меню
+    background.setTexture(&texture_window);
+
+    Font font;
+    if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);                 	  // Установка шрифта главного меню
+    Text Titul;
+    Titul.setFont(font);
+    
+    FillText(Titul, 300, 10, L"Doodle Jump", 200, Color(170, 0, 0), 3, Color(79,60,19));       // Текст с названием игры
+    String name_menu[]{ L"Play", L"Options", L"About Game", L"Exit"};                          // Название пунктов меню
+
+    int left_pos = 170, top_pos = 300, step_pos = 190;
+    Color borderColor = Color(83, 56, 0);
+    game::StartMenu mymenu(window, left_pos, top_pos, step_pos, 4, name_menu, 2, borderColor, start_menu_point,  120);  // Объект игровое меню
+    mymenu.AlignMenu(3);                                                                                                // Выравнивание по левому краю пунктов меню 
+
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (IntRect(mymenu.mainMenu[0].getGlobalBounds()).contains(Mouse::getPosition(window))) {mymenu.MouseChosen(0);}
+		    else if (IntRect(mymenu.mainMenu[1].getGlobalBounds()).contains(Mouse::getPosition(window))) {mymenu.MouseChosen(1);}
+		    else if (IntRect(mymenu.mainMenu[2].getGlobalBounds()).contains(Mouse::getPosition(window))) {mymenu.MouseChosen(2);}
+            else if (IntRect(mymenu.mainMenu[3].getGlobalBounds()).contains(Mouse::getPosition(window))) {mymenu.MouseChosen(3);}
+
+            if (event.type == Event::KeyReleased) // События выбора пунктов меню
+            {
+                if (event.key.code == Keyboard::F4) { window.close(); }         // Нажатие на клавиатуре клавиши Escape
+                if (event.key.code == Keyboard::Up) { mymenu.MoveKeyUp(); }         // Нажатие на клавиатуре стрелки вверх
+                if (event.key.code == Keyboard::Down) { mymenu.MoveKeyDown(); }     // Нажатие на клавиатуре стрелки вниз
+                if (event.key.code == Keyboard::Enter)                              // Нажатие на клавиатуре клавиши Enter                     
+                {
+                    switch (mymenu.getSelectedMenuNumber())                         // Переход на выбранный пункт меню
+                    {
+                    case 0: sleep(milliseconds(100)); GameStart(window); return;
+                    case 1: sleep(milliseconds(100)); Options(window, 1); return;
+                    case 2: sleep(milliseconds(100)); About_Game(); return;
+                    case 3: sleep(milliseconds(100)); Exit(window); return;
+                    }
+                }
+            }
+
+		    if (Mouse::isButtonPressed(Mouse::Left))
+		    {
+			    if (mymenu.mainMenuSelected == 0 && (IntRect(mymenu.mainMenu[0].getGlobalBounds()).contains(Mouse::getPosition(window))))
+					{sleep(milliseconds(100)); GameStart(window); return;}
+			    if (mymenu.mainMenuSelected == 1 && (IntRect(mymenu.mainMenu[1].getGlobalBounds()).contains(Mouse::getPosition(window))))
+					{sleep(milliseconds(100)); Options(window, 1); return;}
+			    if (mymenu.mainMenuSelected == 2 && (IntRect(mymenu.mainMenu[2].getGlobalBounds()).contains(Mouse::getPosition(window))))
+					{sleep(milliseconds(100)); About_Game(); return;}
+                if (mymenu.mainMenuSelected == 3 && (IntRect(mymenu.mainMenu[3].getGlobalBounds()).contains(Mouse::getPosition(window))))
+					{sleep(milliseconds(100)); Exit(window); return;}
+		    }
+        }
+        window.clear();
+        window.draw(background);
+        window.draw(Titul);
+        mymenu.draw();
+        window.display();
+    }
+}
+
+/*!
+* \brief Отрисовка меню настроек игрового процесса.
+* Функция рисует меню ,позволяющее выбирать количество ботов в игре (с возможностью выбрать 0, т.е. режим тренировки) и количество раундов
+* \param[in] window Окно, которое выводится на экран. Передаётся по адресу
+*/
+void GameStart(RenderWindow& window)
+{
+	sleep(milliseconds(200));
     RectangleShape background_play(Vector2f(1920, 1080));
     Texture texture_play;
 
     if (!texture_play.loadFromFile("../../images/2+.jpg")) exit(1);
     background_play.setTexture(&texture_play);
 
+	Font font;    
+	if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);
 	
+	/*-------------------------------------------------------------------------------------------------------*/
+
+	Text rounds_text, count_bots_text;
+	rounds_text.setFont(font); count_bots_text.setFont(font);
+
+	Color gamestart_text_color = Color(119,144,145);
+	Color color_border = Color::Color(215, 189, 158), outline_color_border = Color(167, 147, 123);
+	Color play_exit_color = Color(102, 187, 19);
+	Color chosen_color = Color(192, 0, 0);
+	Color input_color = Color::Red;
+
+	int max_rounds = 13, max_bots = 3;
+
+	int pos_y = 100, step = 200, pos_x_rounds = 500, pos_x_bots = 100;
+
+	FillText(rounds_text, pos_x_rounds, pos_y, "Rounds", 100, gamestart_text_color, 1);
+	FillText(count_bots_text, pos_x_bots, pos_y + 350, "Count bots", 100, gamestart_text_color, 1);
+
+	int pos_x_move_rounds = rounds_text.getLocalBounds().width + 300;
+	int pos_x_move_bots = count_bots_text.getLocalBounds().width + 300;
+	int len_rounds = 200, triangle_width = 50, triangle_height = 90;
+
+	ConvexShape* triangle = new ConvexShape[4];
+	for (size_t i = 0; i < 4; ++i)
+	{triangle[i].setPointCount(3); triangle[i].setFillColor(color_border);}
+	triangle[0].setPoint(0, Vector2f(pos_x_rounds + pos_x_move_rounds + triangle_width * 2, rounds_text.getPosition().y + 20));
+	triangle[0].setPoint(1, Vector2f(pos_x_rounds + pos_x_move_rounds + triangle_width, rounds_text.getPosition().y + triangle_height/2 + 20));
+	triangle[0].setPoint(2, Vector2f(pos_x_rounds + pos_x_move_rounds + triangle_width * 2, rounds_text.getPosition().y + triangle_height + 20));
+	triangle[0].setOutlineThickness(1); triangle[0].setOutlineColor(outline_color_border);
+
+	triangle[1].setPoint(0, Vector2f(len_rounds + pos_x_rounds + pos_x_move_rounds + triangle_width * 3, rounds_text.getPosition().y + triangle_height/2 + 20));
+	triangle[1].setPoint(1, Vector2f(len_rounds + pos_x_rounds + pos_x_move_rounds + triangle_width * 2, rounds_text.getPosition().y + 20));
+	triangle[1].setPoint(2, Vector2f(len_rounds + pos_x_rounds + pos_x_move_rounds + triangle_width * 2, rounds_text.getPosition().y + triangle_height + 20));
+	triangle[1].setOutlineThickness(1); triangle[1].setOutlineColor(outline_color_border);
+
+	triangle[2].setPoint(0,Vector2f(pos_x_bots + pos_x_move_bots + triangle_width * 2, count_bots_text.getPosition().y + 20));
+	triangle[2].setPoint(1,Vector2f(pos_x_bots + pos_x_move_bots + triangle_width, count_bots_text.getPosition().y + triangle_height/2 + 20));
+	triangle[2].setPoint(2,Vector2f(pos_x_bots + pos_x_move_bots + triangle_width * 2, count_bots_text.getPosition().y + triangle_height + 20));
+	triangle[2].setOutlineThickness(1); triangle[2].setOutlineColor(outline_color_border);
+
+	triangle[3].setPoint(0,Vector2f(len_rounds + pos_x_bots + pos_x_move_bots + triangle_width * 3, count_bots_text.getPosition().y + triangle_height/2 + 20));
+	triangle[3].setPoint(1,Vector2f(len_rounds + pos_x_bots + pos_x_move_bots + triangle_width * 2, count_bots_text.getPosition().y + 20));
+	triangle[3].setPoint(2,Vector2f(len_rounds + pos_x_bots + pos_x_move_bots + triangle_width * 2, count_bots_text.getPosition().y + triangle_height + 20));
+	triangle[3].setOutlineThickness(1); triangle[3].setOutlineColor(outline_color_border);
+	
+	Text exit, play;
+	exit.setFont(font); play.setFont(font);
+
+	int pos_y_exit = VideoMode::getDesktopMode().height - 300;
+
+	FillText(exit, pos_x_bots, pos_y_exit + 30, "Exit", 150, play_exit_color, 1);
+	FillText(play, VideoMode::getDesktopMode().width - 500, pos_y_exit, "Play", 200, play_exit_color, 1);
+
+	Text rounds, bots;
+	rounds.setFont(font); bots.setFont(font);
+
+	FillText(rounds, 0, 0, "1", 100, input_color, 1);
+	FillText(bots, 0, 0, "1", 100, input_color, 1);
+
+	int pos_x_rounds_input = triangle[0].getLocalBounds().left + (triangle[1].getLocalBounds().left - triangle[0].getLocalBounds().left)/2 - rounds.getLocalBounds().width/2 + triangle_width*0.5;
+	int pos_x_bots_input = triangle[2].getLocalBounds().left + (triangle[3].getLocalBounds().left - triangle[2].getLocalBounds().left)/2 - bots.getLocalBounds().width/2 + triangle_width*0.5;
+
+	rounds.setPosition(pos_x_rounds_input, triangle[0].getLocalBounds().top - 15);
+	bots.setPosition(pos_x_bots_input, triangle[2].getLocalBounds().top - 15);
+
+	int rounds_input = 1, bots_input = 1;
+
+	/*-------------------------------------------------------------------------------------------------------*/
+
+	int GameStartSelected = 0;
 
     while (window.isOpen())
     {
@@ -18,54 +181,174 @@ void GameStart(RenderWindow& window) // Функция запуска игры
         {
             if (event_play.type == Event::KeyPressed)
             {
+				if (event_play.key.code == Keyboard::F4) { window.close(); }
                 if (event_play.key.code == Keyboard::Escape) {sleep(milliseconds(300)); MenuStart(window, 0); return;}
+				if (event_play.type == Event::Closed) window.close();
             }
+
+
+			if(IntRect(triangle[0].getLocalBounds()).contains(Mouse::getPosition(window))) {GameStartSelected = 0;}
+			else if(IntRect(triangle[1].getLocalBounds()).contains(Mouse::getPosition(window))) {GameStartSelected = 1;}
+			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(window))) {GameStartSelected = 2;}
+		    else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(window))) {GameStartSelected = 3;}
+			else if(IntRect(exit.getPosition().x, exit.getPosition().y, exit.getLocalBounds().width,
+             exit.getLocalBounds().height + exit.getCharacterSize()/4).contains(Mouse::getPosition(window))) {GameStartSelected = 4;}
+			else if(IntRect(play.getPosition().x, play.getPosition().y, play.getLocalBounds().width,
+             play.getLocalBounds().height + play.getCharacterSize()/4).contains(Mouse::getPosition(window))) {GameStartSelected = 5;}
+
+			else if (event_play.type == Event::KeyPressed)
+            {
+				if(event_play.key.code == Keyboard::Up)
+				{ switch (GameStartSelected)
+					{case 0: GameStartSelected = 5; break; case 1: GameStartSelected = 5; break; case 2: GameStartSelected = 0; break;
+					 case 3: GameStartSelected = 1; break; case 4: GameStartSelected = 2; break; case 5: GameStartSelected = 3; break;} }
+				if(event_play.key.code == Keyboard::Down)
+				{ switch (GameStartSelected)
+					{case 0: GameStartSelected = 2; break; case 1: GameStartSelected = 3; break; case 2: GameStartSelected = 5; break;
+					 case 3: GameStartSelected = 5; break; case 4: GameStartSelected = 0; break; case 5: GameStartSelected = 0; break;} }
+				if(event_play.key.code == Keyboard::Right){++GameStartSelected %= 6;}
+				if(event_play.key.code == Keyboard::Left){--GameStartSelected %= 6;}
+            }
+
+			if (GameStartSelected == 0)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left) && IntRect(triangle[0].getGlobalBounds()).contains(Mouse::getPosition(window)))
+				{
+					if (rounds_input > 1)
+						{--rounds_input; sleep(milliseconds(50));}
+					else
+						{}
+				}
+				rounds.setString(std::to_string(rounds_input));
+				pos_x_rounds_input = triangle[0].getLocalBounds().left+(triangle[1].getLocalBounds().left-triangle[0].getLocalBounds().left)/2-rounds.getLocalBounds().width/2+triangle_width*0.5;
+				rounds.setPosition(pos_x_rounds_input, triangle[0].getLocalBounds().top - 15);
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(play_exit_color);
+				triangle[0].setFillColor(chosen_color); play.setFillColor(play_exit_color);
+			}
+			else if (GameStartSelected == 1)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left) && IntRect(triangle[1].getGlobalBounds()).contains(Mouse::getPosition(window)))
+				{
+					if (rounds_input == max_rounds)
+						{}
+					else
+						{++rounds_input; sleep(milliseconds(50));}
+				}
+				rounds.setString(std::to_string(rounds_input));
+				pos_x_rounds_input = triangle[0].getLocalBounds().left+(triangle[1].getLocalBounds().left-triangle[0].getLocalBounds().left)/2-rounds.getLocalBounds().width/2+triangle_width*0.5;
+				rounds.setPosition(pos_x_rounds_input, triangle[0].getLocalBounds().top - 15);
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(play_exit_color);
+				triangle[1].setFillColor(chosen_color); play.setFillColor(play_exit_color);
+			}
+			else if(GameStartSelected == 2)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left) && IntRect(triangle[2].getGlobalBounds()).contains(Mouse::getPosition(window)))
+				{
+					if (bots_input > 0)
+						{--bots_input; sleep(milliseconds(50));}
+					else
+						{}
+				}
+				bots.setString(std::to_string(bots_input));
+				pos_x_bots_input = triangle[2].getLocalBounds().left+(triangle[3].getLocalBounds().left-triangle[2].getLocalBounds().left)/2-bots.getLocalBounds().width/2+triangle_width*0.5;
+				bots.setPosition(pos_x_bots_input, triangle[2].getLocalBounds().top - 15);
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(play_exit_color);
+				triangle[2].setFillColor(chosen_color); play.setFillColor(play_exit_color);
+			}
+			else if (GameStartSelected == 3)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left) && IntRect(triangle[3].getGlobalBounds()).contains(Mouse::getPosition(window)))
+				{
+					if (bots_input == max_bots)
+						{}
+					else
+						{++bots_input; sleep(milliseconds(50));}
+				}
+				bots.setString(std::to_string(bots_input));
+				pos_x_bots_input = triangle[2].getLocalBounds().left+(triangle[3].getLocalBounds().left-triangle[2].getLocalBounds().left)/2-bots.getLocalBounds().width/2+triangle_width*0.5;
+				bots.setPosition(pos_x_bots_input, triangle[2].getLocalBounds().top - 15);;
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(play_exit_color);
+				triangle[3].setFillColor(chosen_color); play.setFillColor(play_exit_color);
+			} else if (GameStartSelected == 4)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					sleep(milliseconds(300)); MenuStart(window, 0); return;
+				}
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(chosen_color);
+				play.setFillColor(play_exit_color);
+			} else if (GameStartSelected == 5)
+			{
+				if(event_play.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					sleep(milliseconds(300)); Play(window); return;
+				}
+				for (size_t i = 0; i < 4; ++i) {triangle[i].setFillColor(color_border);} exit.setFillColor(play_exit_color);
+				play.setFillColor(chosen_color);
+			}
         }
         window.clear();
         window.draw(background_play);
+		window.draw(rounds_text); window.draw(count_bots_text);
+		for (size_t i = 0; i < 4; ++i) {window.draw(triangle[i]);}
+		window.draw(exit); window.draw(play);
+		window.draw(rounds); window.draw(bots);
         window.display();
     }
 }
 
-
-void Options(RenderWindow& window, int player_func_call) // Функция настройки игры
+/*!
+* \brief Отрисовка меню настроек игры.
+* Функция рисует меню настроек, позволяющее выбирать имя игрока, цвет дудла, клавишы для управления (движение вправо - влево),
+* а также ширину игрового поля (узкое, стандартное или широкое). Указанные настройки можно выбрать для двух пользователей.
+* Рекализована запись настроек в файл при нажатии кнопки "Save"
+* \param[in] window Окно, которое выводится на экран. Передаётся по адресу
+* \param[in] player_func_call Номер выбранного игрока (1 или 2)
+*/
+void Options(RenderWindow& window, int player_func_call)
 {
+	sleep(milliseconds(200));
     RectangleShape options_back(Vector2f(VideoMode::getDesktopMode().width, VideoMode::getDesktopMode().height));
     Texture options_texture;
 
-    if (!options_texture.loadFromFile("../../images/2.jpg")) exit(2);
+    if (!options_texture.loadFromFile("../../images/background3.jpg")) exit(2);
     options_back.setTexture(&options_texture);
 
-	Color options_text_color = Color(119,144,145);
-	Color chosen_color = Color(192, 154, 76);
+	Color left_text_color = Color(103, 137, 139);
+	Color options_text_color = Color(30, 30, 30);
+	Color chosen_color = Color(192, 0, 0);
+	Color color_border = Color(192, 154, 76);
+	Color outline_color_border = Color(167, 147, 123);
+	Color color_players = Color(192, 154, 76);
+	Color chosen_color_players = Color(184, 160, 28);
+	Color chosing_var_color = Color(128, 128, 128); 	// Цвет клавиш для управления, имени и ширины игрового поля
+	Color save_exit_color = Color(102, 187, 19);
 	int options_text_size = 110;
 
-	Font font;    
+	Font font;
 	if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);
 
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
 
 	Text* settings_desc_text = new Text[4];
-	Text save;
-	save.setFont(font);
+	Text save, exit;
+	save.setFont(font); exit.setFont(font);
 
-	String settings_text[]{L"Your name", L"Color", L"Control", L"Game field"}; 
+	String settings_text[]{L"Your name", L"Color", L"Control", L"Game field"};
 
 	float pos_y = 150, step = 200, pos_x = 50, exit_save_y = 900;
 
 	for (int i = 0, ypos = pos_y; i < 4; ++i, ypos += step)
 	{
 		settings_desc_text[i].setFont(font);
-		FillText(settings_desc_text[i], pos_x, ypos, settings_text[i], options_text_size, options_text_color, 1);
+		FillText(settings_desc_text[i], pos_x, ypos, settings_text[i], options_text_size, left_text_color, 1);
 	}
 	
-	FillText(save, VideoMode::getDesktopMode().width - 850, exit_save_y, L"Save & Exit", 130, options_text_color);
-
-	Color color_border = Color::Color(215, 189, 158), outline_color_border = Color(167, 147, 123);
+	FillText(save, VideoMode::getDesktopMode().width - 450, exit_save_y, L"Save", 130, save_exit_color);
+	FillText(exit, pos_x + 10, exit_save_y, L"Exit", 130, save_exit_color);
 
 	RectangleShape players1, players2;
 	int border_players = 5, width_players = 400 + border_players * 3, height_players = 120;
-	Color color_players = Color(234, 203, 166), chosen_color_players = Color(184, 160, 28);
 
 	players1.setSize(Vector2f(width_players/2, height_players)); players2.setSize(Vector2f(width_players/2, height_players));
 	players1.setPosition(Vector2f(VideoMode::getDesktopMode().width/2 - width_players/2, 0));
@@ -111,7 +394,7 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 	Text name, left, right, field_size;
 	name.setFont(font); left.setFont(font); right.setFont(font); field_size.setFont(font);
 	name.setCharacterSize(60); left.setCharacterSize(80); right.setCharacterSize(80); field_size.setCharacterSize(80);
-	name.setFillColor(Color::Black); left.setFillColor(options_text_color); right.setFillColor(options_text_color); field_size.setFillColor(options_text_color);
+	name.setFillColor(chosing_var_color); left.setFillColor(options_text_color); right.setFillColor(options_text_color); field_size.setFillColor(chosing_var_color);
 	name.setString(L"Enter your name"); left.setString(L"Left"); right.setString(L"Right");
 	name.setPosition(pos_x_board_name + 30, pos_y + 30);
 	left.setPosition(pos_x_board_name, settings_desc_text[2].getPosition().y + 20);
@@ -149,15 +432,14 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 	Color manip_color = Color::Green;
 
 	Text key_left_text, key_right_text;
-	key_left_text.setFont(font); key_right_text.setFont(font); key_left_text.setFillColor(manip_color); key_right_text.setFillColor(manip_color); 
+	key_left_text.setFont(font); key_right_text.setFont(font); key_left_text.setFillColor(chosing_var_color); key_right_text.setFillColor(chosing_var_color); 
 	key_left_text.setCharacterSize(70); key_right_text.setCharacterSize(60);
 	key_left_text.setString("A"); key_right_text.setString("D");
 	key_left_text.setPosition(manip_l[3].getPosition().x + 20, manip_l[3].getPosition().y + 5);
 	key_right_text.setPosition(manip_r[3].getPosition().x + 20, manip_r[3].getPosition().y + 5);
 
-
 	/*------------------------------------------------------------------------------------------------------------------------------------------*/
-
+	int pos_x_field_size = 0;
 	int chosen_player = player_func_call;
 
 	std::vector<std::string> list_field_size{"Small", "Normal", "Large"};
@@ -168,7 +450,13 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 
 	int OptionsMenuSelected = 0;
 	std::string inputed_name, inputed_l, inputed_r;
-
+	if (chosen_player == 1)
+	{
+		inputed_l = "A"; inputed_r = "D"; color_selected = 0;
+	} else 
+	{
+		inputed_l = "B"; inputed_r = "M"; color_selected = 1;
+	}
 
     while (window.isOpen())
     {
@@ -180,12 +468,16 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 			else if (player_func_call == 2)
 				{players1.setFillColor(color_players); players2.setFillColor(chosen_color);}
 
+			if (event_opt.type == Event::KeyPressed)
+            {
+				if (event_opt.key.code == Keyboard::Escape) {sleep(milliseconds(300)); MenuStart(window, 0); return;}
+				if (event_opt.type == Event::Closed) window.close();
+			}
 
-
-			if(IntRect(players1.getPosition().x, players1.getPosition().y, players1.getSize().x, players1.getSize().y).contains(Mouse::getPosition(window)))
+			if(IntRect(players1.getGlobalBounds()).contains(Mouse::getPosition(window)))
 			{OptionsMenuSelected = 0;}
 
-			else if(IntRect(players2.getPosition().x,players2.getPosition().y, players2.getSize().x, players2.getSize().y).contains(Mouse::getPosition(window)))
+			else if(IntRect(players2.getGlobalBounds()).contains(Mouse::getPosition(window)))
 			{OptionsMenuSelected = 1;}
 
 			else if(IntRect(border_name[0].getPosition().x,border_name[0].getPosition().y,border_name[1].getPosition().x - border_name[3].getPosition().x,
@@ -202,8 +494,10 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 
 			else if(IntRect(triangle[2].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 7;}
 			else if(IntRect(triangle[3].getLocalBounds()).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 8;}	
+			else if(IntRect(exit.getPosition().x, exit.getPosition().y, exit.getLocalBounds().width,
+             exit.getLocalBounds().height + exit.getCharacterSize()/4).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 9;}
 			else if(IntRect(save.getPosition().x, save.getPosition().y, save.getLocalBounds().width,
-             save.getLocalBounds().height + save.getCharacterSize()/4).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 9;}
+             save.getLocalBounds().height + save.getCharacterSize()/4).contains(Mouse::getPosition(window))) {OptionsMenuSelected = 10;}
 
 			else if (event_opt.type == Event::KeyPressed)
             {
@@ -212,59 +506,60 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 					{case 2: OptionsMenuSelected=9; break; case 3: OptionsMenuSelected=2; break; case 4: OptionsMenuSelected=2; break;
 					case 5: OptionsMenuSelected=3; break; case 6: OptionsMenuSelected=4; break; case 7: OptionsMenuSelected=5; break;
 					case 8: OptionsMenuSelected=6; break; case 9: OptionsMenuSelected=7; break; case 0: OptionsMenuSelected=9; break;
-					case 1: OptionsMenuSelected=9; break;} }
-				if(event_opt.key.code == Keyboard::Down)
+					case 1: OptionsMenuSelected=9; break; case 10: OptionsMenuSelected=7; break;}}
+				if(event_opt.key.code == Keyboard::Down) 
 				{ switch (OptionsMenuSelected)
 					{case 2: OptionsMenuSelected=3; break; case 3: OptionsMenuSelected=5; break; case 4: OptionsMenuSelected=6; break;
 					case 5: OptionsMenuSelected=7; break; case 6: OptionsMenuSelected=8; break; case 7: OptionsMenuSelected=9; break;
 					case 8: OptionsMenuSelected=9; break; case 9: OptionsMenuSelected=2; break; case 0: OptionsMenuSelected=2; break;
-					case 1: OptionsMenuSelected=2; break;} }
-				if(event_opt.key.code == Keyboard::Right){++OptionsMenuSelected %=10;}
-				if(event_opt.key.code == Keyboard::Left){--OptionsMenuSelected %=10;}
-
-				if (event_opt.key.code == Keyboard::Escape) {sleep(milliseconds(300)); MenuStart(window, 0); return;}
-				if (event_opt.type == Event::Closed) window.close();
+					case 1: OptionsMenuSelected=2; break; case 10: OptionsMenuSelected=2; break;}}
+				if(event_opt.key.code == Keyboard::Right) {++OptionsMenuSelected %=11;}
+				if(event_opt.key.code == Keyboard::Left) {--OptionsMenuSelected %=11;}
             }
 
 			if (OptionsMenuSelected == 0)
 			{
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);manip_l[i].setFillColor(color_border);
+				manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);} save.setFillColor(save_exit_color);
+				triangle[0].setFillColor(color_border); exit.setFillColor(save_exit_color);
 				chosen_player = 1;
+
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					if (chosen_player != player_func_call)
 						Options(window, 1);
 				}
-				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);manip_l[i].setFillColor(color_border);
-				manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color);
-				triangle[0].setFillColor(color_border);
 			}
 			else if (OptionsMenuSelected == 1)
 			{
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
+				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
+				save.setFillColor(save_exit_color); triangle[0].setFillColor(color_border); exit.setFillColor(save_exit_color);
 				chosen_player = 2;
+
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					if (chosen_player != player_func_call)
 						Options(window, 2);
 				}
-				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
-				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color); triangle[0].setFillColor(color_border);
 			}
 			else if(OptionsMenuSelected == 2)
 			{
 				chosen_player = player_func_call;
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(chosen_color);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);
-				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color); 
+				triangle[i].setFillColor(color_border);} save.setFillColor(save_exit_color); exit.setFillColor(save_exit_color);
+
 				if (event_opt.type == Event::TextEntered)
 				{
 					if (event_opt.text.unicode < 128) 
 					{
-						if (event_opt.text.unicode == 8 && inputed_name.size() > 0) { 		// Нажатие backspace
+						if (event_opt.text.unicode == 8 && inputed_name.size() > 0) { 		// Стирание введённого символа
 							inputed_name.erase(inputed_name.size() - 1);
-						} else if (event_opt.text.unicode == 8) {}
-						else if (event_opt.text.unicode == 13) {}							// carriage return (enter)	
-						else if(name.getLocalBounds().width < len_board_name - 70) {
+						} else if (event_opt.text.unicode == 8) {}							// Нажатие backspace
+						else if (event_opt.text.unicode == Keyboard::Space) {std::cout << 100;} // Не работает!
+						else if (event_opt.text.unicode == 13) {}							// Нажатие enter
+						else if(name.getLocalBounds().width < len_board_name - 85) {
 							inputed_name += static_cast<char>(event_opt.text.unicode);
 						}
 						name.setString(inputed_name);
@@ -274,30 +569,37 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 			}
 			else if (OptionsMenuSelected == 3)
 			{
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
+				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
+				save.setFillColor(save_exit_color); triangle[0].setFillColor(chosen_color); exit.setFillColor(save_exit_color);
 				chosen_player = player_func_call;
-				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left) && IntRect(triangle[0].getGlobalBounds()).contains(Mouse::getPosition(window)))
 				{
 					if(color_selected == 0) { color_selected = list_colors.size() - 1;}
-					else {--color_selected;}
+					else {--color_selected; sleep(milliseconds(50));}
 				}
-				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
-				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color); triangle[0].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 4)
 			{
-				chosen_player = player_func_call;
-				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
-				{
-					if(color_selected == list_colors.size() - 1) {color_selected = 0;}
-					else {++color_selected;}
-				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color); triangle[1].setFillColor(chosen_color);
+				save.setFillColor(save_exit_color); triangle[1].setFillColor(chosen_color); exit.setFillColor(save_exit_color);
+				chosen_player = player_func_call;
+
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left) && IntRect(triangle[1].getGlobalBounds()).contains(Mouse::getPosition(window)))
+				{
+					if(color_selected == list_colors.size() - 1) {color_selected = 0;}
+					else {++color_selected; sleep(milliseconds(50));}
+				}
 			} else if (OptionsMenuSelected == 5)
 			{
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
+				manip_l[i].setFillColor(chosen_color); manip_r[i].setFillColor(color_border);
+				triangle[i].setFillColor(color_border);} save.setFillColor(save_exit_color);  exit.setFillColor(save_exit_color);
 				chosen_player = player_func_call;
-				if (event_opt.type == Event::TextEntered) {
+
+				if (event_opt.type == Event::TextEntered) 
+				{
 					if (event_opt.text.unicode == 8) {}			// Backspace
 					else if (event_opt.text.unicode == 13) {} 	// Enter
 					else if(event_opt.text.unicode < 128) {
@@ -306,12 +608,13 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 							key_left_text.setString(inputed_l);
 					}
 				}
-				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
-				manip_l[i].setFillColor(chosen_color); manip_r[i].setFillColor(color_border);
-				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color); 
 			} else if (OptionsMenuSelected == 6)
 			{
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
+				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(chosen_color);
+				triangle[i].setFillColor(color_border);} save.setFillColor(save_exit_color); exit.setFillColor(save_exit_color);
 				chosen_player = player_func_call;
+
 				if (event_opt.type == Event::TextEntered) {
 					if (event_opt.text.unicode == 8) {}			// Backspace
 					else if (event_opt.text.unicode == 13) {} 	// Enter
@@ -321,38 +624,63 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 							key_right_text.setString(inputed_r);
 					}
 				}
-				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
-				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(chosen_color);
-				triangle[i].setFillColor(color_border);} save.setFillColor(options_text_color);
 			} else if (OptionsMenuSelected == 7)
 			{
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
+				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
+				save.setFillColor(save_exit_color);triangle[2].setFillColor(chosen_color); exit.setFillColor(save_exit_color);
 				chosen_player = player_func_call;
-				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				
+				if(event_opt.key.code==Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left) && IntRect(triangle[2].getGlobalBounds()).contains(Mouse::getPosition(window)))
 				{
 					if(field_selected == 0) {}
-					else {--field_selected;}
+					else {--field_selected; sleep(milliseconds(50));}
 				}
-				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
-				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color);triangle[2].setFillColor(chosen_color);
 			} else if (OptionsMenuSelected == 8)
 			{
-				chosen_player = player_func_call;
-				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
-				{
-					if(field_selected == list_field_size.size() - 1) {}
-					else {++field_selected;}
-				}
 				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
 				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(options_text_color);triangle[3].setFillColor(chosen_color);
-			} else if (OptionsMenuSelected == 9)
+				save.setFillColor(save_exit_color);triangle[3].setFillColor(chosen_color); exit.setFillColor(save_exit_color);
+				chosen_player = player_func_call;
+
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left) && IntRect(triangle[3].getGlobalBounds()).contains(Mouse::getPosition(window)))
+				{
+					if(field_selected == list_field_size.size() - 1) {}
+					else {++field_selected; sleep(milliseconds(50));}
+				}
+			} else if (OptionsMenuSelected == 9) {
+				chosen_player = player_func_call;
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
+				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
+				save.setFillColor(save_exit_color); exit.setFillColor(chosen_color);
+				
+				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					MenuStart(window, 0);
+					return;
+				}
+			}
+			else if (OptionsMenuSelected == 10)
 			{
 				chosen_player = player_func_call;
+				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
+				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
+				save.setFillColor(chosen_color); exit.setFillColor(save_exit_color);
+
 				if(event_opt.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					std::string color = std::to_string(color_selected);
 					std::vector<std::string> data_save;
+					if (inputed_name == "")
+						{
+							if (chosen_player == 1)
+							{
+								inputed_name = "Player1";
+							} else 
+							{
+								inputed_name = "Player2";
+							}
+						}
 					data_save.push_back(inputed_name); data_save.push_back(color); data_save.push_back(inputed_l);
 					data_save.push_back(inputed_r); data_save.push_back(list_field_size.at(field_selected));
 					if(chosen_player == 1)
@@ -361,14 +689,11 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 					} else {
 						SaveSattings("../../SystemFiles/settingsP2.cfg", data_save);
 					}
-					sleep(milliseconds(300));
-					MenuStart(window, 0);
-					return;
+					sleep(milliseconds(100));
 				}
-				for (size_t i = 0; i < 4; ++i) { border_name[i].setFillColor(color_border);
-				manip_l[i].setFillColor(color_border);manip_r[i].setFillColor(color_border);triangle[i].setFillColor(color_border);}
-				save.setFillColor(chosen_color);
 			}
+
+			// if (inputed_name.size() == -1) {name.setString("Enter your name:");}
 
 			field_size.setString(list_field_size.at(field_selected));
 			chose_color.setFillColor(list_colors.at(color_selected)); 
@@ -378,6 +703,8 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 			else if (chosen_player == 2 && player_func_call == 1)
 				{players2.setFillColor(chosen_color); players1.setFillColor(color_players);}
 
+			pos_x_field_size = triangle[2].getLocalBounds().left+(triangle[3].getLocalBounds().left-triangle[2].getLocalBounds().left)/2-field_size.getLocalBounds().width/2+triangle_width*0.5;
+			field_size.setPosition(pos_x_field_size, triangle[2].getLocalBounds().top - 5);
         }
         window.clear();
 		window.draw(options_back);
@@ -392,13 +719,11 @@ void Options(RenderWindow& window, int player_func_call) // Функция на�
 		window.draw(chose_color);
 		window.draw(field_size);
 		window.draw(key_left_text); window.draw(key_right_text); 
-		window.draw(save);
+		window.draw(save); window.draw(exit);
         window.display();
     }
 }
 
-
-// Функция с описанием игры
 void About_Game()
 {
     RenderWindow About(VideoMode::getDesktopMode(), L"О игре", Style::Fullscreen);
@@ -425,7 +750,12 @@ void About_Game()
     }
 }
 
-
+/*!
+* \brief Диалоговое окно, появляющееся при нажатии кнопки выхода из игры.
+* При нажатии кнопки "Exit" поялвяется диалоговое окно, с вопросом "Do you want exit?",
+* на что пользователь может нажать (как с помощью клавиатуры, так и мышью) "Yes" или "No"
+* \param[in] window Окно, которое выводится на экран. Передаётся по адресу
+*/
 void Exit(RenderWindow& window)
 {
 	Color buttons_color = Color::Black, buttons_chosen = Color::Red;
@@ -482,15 +812,15 @@ void Exit(RenderWindow& window)
 				if(event_exit.key.code == Keyboard::Left) {if(exit_selected==0) exit_selected = 1; else --exit_selected %=2;}
             }
 
-
-
-			if (exit_selected == 0)
+			if (exit_selected == 0 && IntRect(exit_yes.getPosition().x, exit_yes.getPosition().y, exit_yes.getLocalBounds().width * 1.5,
+             exit_yes.getLocalBounds().height + exit_yes.getCharacterSize()/3).contains(Mouse::getPosition(window)))
 			{
 				if(event_exit.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
 					window.close();
 				}
-			} else if (exit_selected == 1)
+			} else if (exit_selected == 1 && IntRect(exit_no.getPosition().x, exit_no.getPosition().y, exit_no.getLocalBounds().width * 1.5,
+             exit_no.getLocalBounds().height + exit_no.getCharacterSize()/3).contains(Mouse::getPosition(window)))
 			{
 				if(event_exit.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
 				{
@@ -498,8 +828,6 @@ void Exit(RenderWindow& window)
 					MenuStart(window, 3); return;
 				}
 			}
-
-
 
 			if (exit_selected == 1)
 				{exit_no.setFillColor(buttons_chosen); exit_yes.setFillColor(buttons_color);}
@@ -510,4 +838,10 @@ void Exit(RenderWindow& window)
 		window.draw(exit_text); window.draw(exit_yes); window.draw(exit_no);
 		window.display();
 	}
+}
+
+
+void Play(RenderWindow& window)
+{
+
 }
