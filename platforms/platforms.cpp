@@ -2,7 +2,7 @@
 
 platforms::platforms(PlatType type, float x, float y):
 shape(sf::Vector2f(150.f, 30.f)), _type(type), _coordX(x), _coordY(y), IsRight(false), IsJumped(false){
-    shape.setOrigin(75,15);
+    shape.setOrigin(75.f,15.f);
     switch (_type)
     {
     case 0:{
@@ -63,8 +63,8 @@ void platforms::Draw(sf::RenderWindow& window){
         }
         case 3:{
             if (IsJumped){
-                platforms newplat(static_cast<PlatType>(gen()%4),gen()%(window.getSize().x-75), -(window.getSize().y-_coordY));
-                *this=newplat;
+                _color=sf::Color(0,0,0,0);
+                shape.setFillColor(_color);
             }
             break;
         }

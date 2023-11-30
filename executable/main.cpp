@@ -58,9 +58,9 @@ int main(){
 
     platforms _platforms[5]{plat1,plat2,plat3,plat4,plat5}; //Массив платформ для простоты работы с ними
 
-    for (size_t i = 0; i < 4; ++i)
+    for (size_t i = 1; i < 4; ++i)
     {
-        if(_platforms[i]._type==_platforms[i+1]._type){
+        if(_platforms[i]._type==_platforms[i-1]._type){
             platforms newplat(static_cast<PlatType>((_platforms[i]._type+1)%4),75+gen()%(int)(WinSizeX-150), _platforms[i]._coordY);
             _platforms[i]=newplat;
         }
@@ -177,7 +177,8 @@ int main(){
                 (DoodleY+DoodleSizeY/2<=_platforms[i]._coordY+PlatSizeY/2)&& //Нижний край дудла выше нижнего края платформы
                 (_platforms[i]._coordX-PlatSizeX/2<DoodleX+DoodleSizeX/2)&& 
                 (DoodleX-DoodleSizeX/2<_platforms[i]._coordX+PlatSizeX/2)&& //Дудл попадает на платформу хотя бы краем своего тела
-                _platforms[i]._type!=broken){ //Платформа не сломанная
+                _platforms[i]._type!=broken&&
+                !(_platforms[i]._type==disappearing&&_platforms[i].IsJumped)){ //Платформа не сломанная
                     isUp=true;
                     WindowUp=true;
                     prevplatformheught=_platforms[i]._coordY;
@@ -188,7 +189,7 @@ int main(){
                 }
             }
         }
-        if (isUp){ // дудл поднимается
+        else if (isUp){ // дудл поднимается
             for (size_t i = 0; i < 5; ++i){
                 if ((_platforms[i]._coordY-PlatSizeY/2<=DoodleY-DoodleSizeY/2)&& //Верхний край дудла ниже верхнего края платформы
                 (DoodleY-DoodleSizeY/2<=_platforms[i]._coordY+PlatSizeY/2)&& //Верхний край дудла выше нижнего края платформы
@@ -204,8 +205,11 @@ int main(){
 
         window.clear(sf::Color(255, 255, 255));
 
+        BubbleSort(_platforms, 5);
+        
         for (size_t i = 0; i < 5; ++i){
             if (_platforms[i]._coordY>WinSizeY+PlatSizeY/2){
+                
                 int type=gen()%4;
                 if (type==_platforms[0]._type){
                     type+=1;
@@ -218,7 +222,7 @@ int main(){
         }
 
         BubbleSort(_platforms, 5);
-      
+
         doodlespriteleft.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
                                    static_cast<float>(DoodleY-38.f)));
         doodlespriteright.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
@@ -231,6 +235,5 @@ int main(){
      
         window.display();
     }
-    
     return 0;
 }
