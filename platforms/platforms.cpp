@@ -1,24 +1,48 @@
 #include "platforms.hpp"
+using namespace sf;
 
 platforms::platforms(PlatType type, float x, float y):
-shape(sf::Vector2f(150.f, 30.f)), _type(type), _coordX(x), _coordY(y), IsRight(false), IsJumped(false){
-    shape.setOrigin(75,15);
+shape(sf::Vector2f(50.f, 10.f)), _type(type), _coordX(x), _coordY(y), IsRight(false), IsJumped(false),GreenP(false), BrownP(false){
+
+
+
+   
+
+
+
+    shape.setOrigin(35,10);
     switch (_type)
     {
     case 0:{
-        _color=sf::Color::Cyan;
+        _color=sf::Color(255,255,255); //Green
+        GreenP=true;
+        BrownP=false;
+        BlueP=false;
+        GreyP=false;
         break;
     }
     case 1:{
-        _color=sf::Color(205,133,65); //Brown
+        _color=sf::Color(255,255,255); //Brown
+        GreenP=false;
+        BrownP=true;
+        BlueP=false;
+        GreyP=false;
         break;
     }
     case 2:{
-        _color=sf::Color::Blue;
+        _color=sf::Color(255,255,255); //Blue
+        GreenP=false;
+        BrownP=false;
+        BlueP=true;
+        GreyP=false;
         break;
     }
     case 3:{
-        _color=sf::Color(122,122,122);
+        _color=sf::Color(255,255,255); //Grey
+        GreenP=false;
+        BrownP=false;
+        BlueP=false;
+        GreyP=true;
         break;
     }
     default:
@@ -63,12 +87,16 @@ void platforms::Draw(sf::RenderWindow& window){
         }
         case 3:{
             if (IsJumped){
-                platforms newplat(static_cast<PlatType>(gen()%4),gen()%(window.getSize().x-75), -(window.getSize().y-_coordY));
+                platforms newplat(static_cast<PlatType>(gen()%3),gen()%(window.getSize().x-75), -15);
                 *this=newplat;
             }
             break;
         }
     }
     this->shape.setPosition(_coordX, _coordY);
+    if (_coordY>window.getSize().y+15){
+        platforms newplat2(static_cast<PlatType>(gen()%3),gen()%(window.getSize().x-75), -15);
+        *this=newplat2;
+    }
     window.draw(this->shape);
 }
