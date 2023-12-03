@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDART 20)
 
 set(SFML_STATIC_LIBRARIES TRUE)
 
-set(SFML_DIR "C:/Program Files/SFML-2.6.0/lib/cmake/SFML")
+set(SFML_DIR "C:/Users/Lucifer/Desktop/SFML-2.6.0/lib/cmake/SFML")
 
 find_package(SFML 2.4.2 COMPONENTS graphics audio window system REQUIRED)
 
