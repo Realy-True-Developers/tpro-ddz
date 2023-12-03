@@ -39,14 +39,14 @@ int main(){
     bool gamepause=true; //Флаг паузы
     bool WindowUp=false; //Подъём экрана поосле отскока от платформы
     // Объект, который, собственно, является главным окном приложения
-    sf::RenderWindow window(sf::VideoMode(900, 1000), "Game", sf::Style::Default, settings);
+    RenderWindow window(VideoMode(900, 1000), "Game", Style::Default, settings);
 
     int WinSizeX = window.getSize().x;
     int WinSizeY = window.getSize().y; //Переменные размера окна, чтобы не вызвать постоянно функции
 
-    sf::RectangleShape pause(sf::Vector2f(WinSizeX, WinSizeY));
-    pause.setFillColor(sf::Color(122,122,122,200));
-    pause.setPosition(sf::Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
+    RectangleShape pause(Vector2f(WinSizeX, WinSizeY));
+    pause.setFillColor(Color(122,122,122,200));
+    pause.setPosition(Vector2f(0,0)); //Прямоугольник, затемняющий экран при выходе в меню паузы
 
 
 
@@ -66,6 +66,7 @@ int main(){
         }
     }
     
+
     sf::RectangleShape Doodle(sf::Vector2f(30.f, 45.f));
 
     Doodle.setFillColor(sf::Color(0,255,0,0));
@@ -74,7 +75,7 @@ int main(){
     float DoodleX=WinSizeX / 2;
     float DoodleY=WinSizeY - 100.0f;
 
-    Doodle.setPosition(sf::Vector2f(static_cast<float>(DoodleX),
+    Doodle.setPosition(Vector2f(static_cast<float>(DoodleX),
                                    static_cast<float>(DoodleY)));
     
     doodlespriteright.setPosition(sf::Vector2f(static_cast<float>(DoodleX-30.f),
@@ -96,13 +97,14 @@ int main(){
         sf::Event event;
 
         while (window.pollEvent(event)){
-            if (event.type == sf::Event::Closed)
+            if (event.type == Event::Closed)
                 window.close();
 
-            if (event.type == sf::Event::KeyReleased && event.key.code==sf::Keyboard::Escape)
+            if (event.type == Event::KeyReleased && event.key.code==Keyboard::Escape)
             {
-                sf::Event pauseEvent;
+                Event pauseEvent;
                 gamepause=true;
+                // Pause(window);
                 for (size_t i = 0; i < 5; ++i){
                         _platforms[i].Draw(window);
                     }
@@ -116,22 +118,23 @@ int main(){
                 while (gamepause)
                 {
                     while (window.pollEvent(pauseEvent)){
-                        if (pauseEvent.type == sf::Event::Closed)
+                        if (pauseEvent.type == Event::Closed)
                             window.close();               
-                        if(pauseEvent.type == sf::Event::KeyReleased && pauseEvent.key.code==sf::Keyboard::Escape){
+                        if(pauseEvent.type == Event::KeyReleased && pauseEvent.key.code==Keyboard::Escape){
                             gamepause=false;
                         }
                     }
                 }
             }
         }
+
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
             if (DoodleX>=DoodleSizeX/2)
                 DoodleX-=0.07f;
 
             lr=false;
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right)){
+        if (Keyboard::isKeyPressed(Keyboard::Key::D) || Keyboard::isKeyPressed(Keyboard::Key::Right)){
             if (DoodleX<=WinSizeX-DoodleSizeX/2)
                 DoodleX+=0.07f;
 
@@ -165,7 +168,7 @@ int main(){
         }
       
         if(DoodleY>=WinSizeY+DoodleSizeY/2){
-            window.clear(sf::Color(255, 255, 255));
+            window.clear(Color(255, 255, 255));
             return 0;
         }
      
@@ -203,7 +206,7 @@ int main(){
             }
         }
 
-        window.clear(sf::Color(255, 255, 255));
+        window.clear(Color(255, 255, 255));
 
         BubbleSort(_platforms, 5);
         
