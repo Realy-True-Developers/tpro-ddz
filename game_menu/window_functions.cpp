@@ -11,6 +11,7 @@
 
 #include "game_menu.hpp"
 
+
 /*!
 * \brief Отрисовка главного меню игры.
 * Функция рисует главное меню, позволяет переходить к другим пунктам как мышью, так и клавиатурой
@@ -434,7 +435,7 @@ void Options(RenderWindow& window, int player_func_call)
 	Text key_left_text, key_right_text;
 	key_left_text.setFont(font); key_right_text.setFont(font); key_left_text.setFillColor(chosing_var_color); key_right_text.setFillColor(chosing_var_color); 
 	key_left_text.setCharacterSize(70); key_right_text.setCharacterSize(60);
-	key_left_text.setString("A"); key_right_text.setString("D");
+	// key_left_text.setString("A"); key_right_text.setString("D");
 	key_left_text.setPosition(manip_l[3].getPosition().x + 20, manip_l[3].getPosition().y + 5);
 	key_right_text.setPosition(manip_r[3].getPosition().x + 20, manip_r[3].getPosition().y + 5);
 
@@ -450,12 +451,15 @@ void Options(RenderWindow& window, int player_func_call)
 
 	int OptionsMenuSelected = 0;
 	std::string inputed_name, inputed_l, inputed_r;
+
 	if (chosen_player == 1)
 	{
 		inputed_l = "A"; inputed_r = "D"; color_selected = 0;
+		key_left_text.setString(inputed_l); key_right_text.setString(inputed_r);
 	} else 
 	{
 		inputed_l = "B"; inputed_r = "M"; color_selected = 1;
+		key_left_text.setString(inputed_l); key_right_text.setString(inputed_r);
 	}
 
     while (window.isOpen())
@@ -578,6 +582,7 @@ void Options(RenderWindow& window, int player_func_call)
 				{
 					if(color_selected == 0) { color_selected = list_colors.size() - 1;}
 					else {--color_selected; sleep(milliseconds(50));}
+					sleep(milliseconds(100));
 				}
 			} else if (OptionsMenuSelected == 4)
 			{
@@ -590,6 +595,7 @@ void Options(RenderWindow& window, int player_func_call)
 				{
 					if(color_selected == list_colors.size() - 1) {color_selected = 0;}
 					else {++color_selected; sleep(milliseconds(50));}
+					sleep(milliseconds(100));
 				}
 			} else if (OptionsMenuSelected == 5)
 			{
@@ -696,7 +702,7 @@ void Options(RenderWindow& window, int player_func_call)
 			// if (inputed_name.size() == -1) {name.setString("Enter your name:");}
 
 			field_size.setString(list_field_size.at(field_selected));
-			chose_color.setFillColor(list_colors.at(color_selected)); 
+			chose_color.setFillColor(list_colors.at(color_selected));
 
 			if(chosen_player == 1 && player_func_call == 2)
 				{players1.setFillColor(chosen_color); players2.setFillColor(color_players);}
@@ -844,4 +850,94 @@ void Exit(RenderWindow& window)
 void Play(RenderWindow& window)
 {
 
+}
+
+
+/*!
+* \brief Диалоговое окно, появляющееся при нажатии кнопки Esc во время игры.
+* При нажатии клавиши Esc поялвяется диалоговое окно, с возможностью выйти из игры в главное меню
+* или продолжить игру
+* \param[in] window Окно, которое выводится на экран. Передаётся по адресу
+*/
+void Pause(RenderWindow& window)
+{
+	Color buttons_color = Color::Black, buttons_chosen = Color::Red;
+
+	int exit_width = 800, exit_height = 300;
+	RectangleShape ExitShape;
+	ExitShape.setPosition(Vector2f(VideoMode::getDesktopMode().width/2 - exit_width/2, VideoMode::getDesktopMode().height/2 - exit_height/2));
+	ExitShape.setSize(Vector2f(exit_width, exit_height));
+	ExitShape.setFillColor(Color(234, 203, 166));
+	ExitShape.setOutlineThickness(5);
+	ExitShape.setOutlineColor(Color(167, 147, 123));
+
+	Font font;
+    if (!font.loadFromFile("../../fonts/doodle.ttf")) exit(3);
+
+	Text pause_text("Pause", font, 120);
+	pause_text.setFillColor(Color::Black);
+	pause_text.setPosition(ExitShape.getPosition().x + (ExitShape.getLocalBounds().width - pause_text.getLocalBounds().width)/2 - 10, ExitShape.getPosition().y + 10);
+
+	Text pause_exit("Exit", font, 65);
+	pause_exit.setFillColor(buttons_color);
+	pause_exit.setPosition(ExitShape.getPosition().x + 50,
+	ExitShape.getPosition().y + ExitShape.getLocalBounds().height - pause_exit.getLocalBounds().height - 60);
+
+	Text pause_continue("Continue", font, 65);
+	pause_continue.setFillColor(buttons_chosen);
+	pause_continue.setPosition(ExitShape.getPosition().x + ExitShape.getLocalBounds().width - 350,
+	ExitShape.getPosition().y + ExitShape.getLocalBounds().height - pause_continue.getLocalBounds().height - 60);
+
+	int pause_selected = 1;
+
+	while (window.isOpen())
+    {
+        Event event_pause;
+        while (window.pollEvent(event_pause))
+        {
+			if (event_pause.type == Event::KeyReleased)
+            {
+                if (event_pause.key.code == Keyboard::Escape) {MenuStart(window, 3); return;}
+				if(event_pause.type == Event::Closed) window.close();
+			}
+
+			if(IntRect(pause_exit.getPosition().x, pause_exit.getPosition().y, pause_exit.getLocalBounds().width * 1.5,
+             pause_exit.getLocalBounds().height + pause_exit.getCharacterSize()/3).contains(Mouse::getPosition(window)))
+			{pause_selected = 0;}
+
+			else if(IntRect(pause_continue.getPosition().x, pause_continue.getPosition().y, pause_continue.getLocalBounds().width * 1.5,
+             pause_continue.getLocalBounds().height + pause_continue.getCharacterSize()/3).contains(Mouse::getPosition(window)))
+			{pause_selected = 1;}
+
+			else if (event_pause.type == Event::KeyPressed)
+            {
+				if(event_pause.key.code == Keyboard::Right) ++pause_selected %=2;
+				if(event_pause.key.code == Keyboard::Left) {if(pause_selected==0) pause_selected = 1; else --pause_selected %=2;}
+            }
+
+			if (pause_selected == 0 && IntRect(pause_exit.getPosition().x, pause_exit.getPosition().y, pause_exit.getLocalBounds().width * 1.5,
+             pause_exit.getLocalBounds().height + pause_exit.getCharacterSize()/3).contains(Mouse::getPosition(window)))
+			{
+				if(event_pause.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					MenuStart(window, 0); return;
+				}
+			} else if (pause_selected == 1 && IntRect(pause_continue.getPosition().x, pause_continue.getPosition().y, pause_continue.getLocalBounds().width * 1.5,
+             pause_continue.getLocalBounds().height + pause_continue.getCharacterSize()/3).contains(Mouse::getPosition(window)))
+			{
+				if(event_pause.key.code == Keyboard::Enter || Mouse::isButtonPressed(Mouse::Left))
+				{
+					sleep(milliseconds(100)); return;
+				}
+			}
+
+			if (pause_selected == 1)
+				{pause_continue.setFillColor(buttons_chosen); pause_exit.setFillColor(buttons_color);}
+			else if (pause_selected == 0)
+				{pause_continue.setFillColor(buttons_color); pause_exit.setFillColor(buttons_chosen);}
+		}
+		window.draw(ExitShape);
+		window.draw(pause_text); window.draw(pause_exit); window.draw(pause_continue);
+		window.display();
+	}
 }

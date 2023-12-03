@@ -3,13 +3,6 @@ using namespace sf;
 
 platforms::platforms(PlatType type, float x, float y):
 shape(sf::Vector2f(50.f, 10.f)), _type(type), _coordX(x), _coordY(y), IsRight(false), IsJumped(false),GreenP(false), BrownP(false){
-
-
-
-   
-
-
-
     shape.setOrigin(35,10);
     switch (_type)
     {
@@ -87,8 +80,8 @@ void platforms::Draw(sf::RenderWindow& window){
         }
         case 3:{
             if (IsJumped){
-                platforms newplat(static_cast<PlatType>(gen()%3),gen()%(window.getSize().x-75), -15);
-                *this=newplat;
+                _color=sf::Color(0,0,0,0);
+                shape.setFillColor(_color);
             }
             break;
         }

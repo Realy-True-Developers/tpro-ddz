@@ -4,7 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
-using namespace std;
 
 enum PlatType{
     standart, //Обычные платформы
@@ -34,7 +33,7 @@ public:
     float _coordX, _coordY;
     sf::Color _color;
     bool IsRight;
-    bool IsJumped;
+    bool IsJumped=false;
     bool GreenP;
     bool BrownP;
     bool BlueP;
