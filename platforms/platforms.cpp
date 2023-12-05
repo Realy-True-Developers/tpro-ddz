@@ -1,46 +1,34 @@
 #include "platforms.hpp"
-using namespace sf;
+using namespace std;
 
 platforms::platforms(PlatType type, float x, float y):
-shape(sf::Vector2f(50.f, 10.f)), _type(type), _coordX(x), _coordY(y), IsRight(false), IsJumped(false),GreenP(false), BrownP(false){
-    shape.setOrigin(35,10);
+shape(sf::Vector2f(60.f, 14.f)), _type(type), _coordX(x), _coordY(y), IsRight(static_cast<bool>(rand()%2)), IsJumped(false){
+    shape.setOrigin(30,7);
+    game_tiles_img.loadFromFile("../../images/game-tiles.png");
+    game_tiles_text.loadFromImage(game_tiles_img); //передал в него объект Image
+    game_tiles_sprite.setTexture(game_tiles_text); //передал в него объект Texture
     switch (_type)
     {
     case 0:{
-        _color=sf::Color(255,255,255); //Green
-        GreenP=true;
-        BrownP=false;
-        BlueP=false;
-        GreyP=false;
+        _color=sf::Color::Green;
         break;
     }
     case 1:{
-        _color=sf::Color(255,255,255); //Brown
-        GreenP=false;
-        BrownP=true;
-        BlueP=false;
-        GreyP=false;
+        _color=sf::Color(205,133,65); //Brown
         break;
     }
     case 2:{
-        _color=sf::Color(255,255,255); //Blue
-        GreenP=false;
-        BrownP=false;
-        BlueP=true;
-        GreyP=false;
+        _color=sf::Color::Blue;
         break;
     }
     case 3:{
-        _color=sf::Color(255,255,255); //Grey
-        GreenP=false;
-        BrownP=false;
-        BlueP=false;
-        GreyP=true;
+        _color=sf::Color(122,122,122);
         break;
     }
     default:
         break;
     }
+
     shape.setFillColor(_color);
 }
 
@@ -59,17 +47,26 @@ void platforms::SetCoords(float x, float y){
 void platforms::Draw(sf::RenderWindow& window){
     random_device rd;   // non-deterministic generator
     mt19937 gen(rd());
+    if (_coordY>window.getSize().y+5){
+        platforms newplat2(static_cast<PlatType>(gen()%4),25+gen()%(window.getSize().x-150), -5);
+        *this=newplat2;
+    }
     switch (_type)
     {
-        case 0:
+        case 0:{
+            game_tiles_sprite.setTextureRect(sf::IntRect(0,0,64,16));
             break;
-        case 1:
+        }
+        case 1:{
+            game_tiles_sprite.setTextureRect(sf::IntRect(0,72,64,16));
             break;
+        }
         case 2:{
-            if (this->IsRight)
-                this->SetX(this->_coordX+0.03f);
+            game_tiles_sprite.setTextureRect(sf::IntRect(0,17,64,17));
+            if (IsRight)
+                SetX(_coordX+0.03f);
             else
-                this->SetX(this->_coordX-0.03f); //Передвигаем движущиеся платформы
+                SetX(_coordX-0.03f); //Передвигаем движущиеся платформы
             if (_coordX>=window.getSize().x-75){
                 IsRight=false;
                 break;
@@ -79,6 +76,7 @@ void platforms::Draw(sf::RenderWindow& window){
             break;
         }
         case 3:{
+            game_tiles_sprite.setTextureRect(sf::IntRect(0,36,64,16));
             if (IsJumped){
                 _color=sf::Color(0,0,0,0);
                 shape.setFillColor(_color);
@@ -86,10 +84,9 @@ void platforms::Draw(sf::RenderWindow& window){
             break;
         }
     }
-    this->shape.setPosition(_coordX, _coordY);
-    if (_coordY>window.getSize().y+15){
-        platforms newplat2(static_cast<PlatType>(gen()%3),gen()%(window.getSize().x-75), -15);
-        *this=newplat2;
-    }
-    window.draw(this->shape);
+    shape.setPosition(_coordX, _coordY);
+    game_tiles_sprite.setPosition(_coordX-30, _coordY-7);
+
+    window.draw(shape);
+    //window.draw(game_tiles_sprite);
 }

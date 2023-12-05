@@ -15,6 +15,10 @@ enum PlatType{
 class platforms
 {
 public:
+    sf::Image game_tiles_img;
+    sf::Texture game_tiles_text;
+    sf::Sprite game_tiles_sprite;
+    
     platforms()=delete;
     ~platforms()=default;
     
@@ -34,8 +38,4 @@ public:
     sf::Color _color;
     bool IsRight;
     bool IsJumped=false;
-    bool GreenP;
-    bool BrownP;
-    bool BlueP;
-    bool GreyP;
 };
